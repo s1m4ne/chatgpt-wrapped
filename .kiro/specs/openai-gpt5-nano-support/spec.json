@@ -1,0 +1,22 @@
+{
+  "feature_name": "openai-gpt5-nano-support",
+  "created_at": "2025-12-09T21:15:00+09:00",
+  "updated_at": "2025-12-09T21:45:00+09:00",
+  "language": "ja",
+  "phase": "implementation-complete",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true
+}

@@ -6,7 +6,7 @@ interface FileUploaderProps {
   accept?: string
 }
 
-const MAX_FILE_SIZE_MB = 100
+const MAX_FILE_SIZE_MB = 1000
 
 export function FileUploader({
   onFileSelect,

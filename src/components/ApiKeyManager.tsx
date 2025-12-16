@@ -11,9 +11,6 @@ const STORAGE_KEY_PROVIDER = 'chatgpt-wrapped-llm-provider'
 const STORAGE_KEY_GEMINI = 'chatgpt-wrapped-gemini-api-key'
 const STORAGE_KEY_OPENAI = 'chatgpt-wrapped-openai-api-key'
 
-const ENV_GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY as string | undefined
-const ENV_OPENAI_KEY = import.meta.env.VITE_OPENAI_API_KEY as string | undefined
-
 export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
   const [provider, setProvider] = useState<LLMProvider>('gemini')
   const [apiKey, setApiKey] = useState('')
@@ -32,9 +29,9 @@ export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
     const storedGeminiKey = localStorage.getItem(STORAGE_KEY_GEMINI)
     const storedOpenAIKey = localStorage.getItem(STORAGE_KEY_OPENAI)
 
-    // Determine initial keys (localStorage優先、なければ環境変数)
-    const geminiKey = storedGeminiKey || ENV_GEMINI_KEY || null
-    const openaiKey = storedOpenAIKey || ENV_OPENAI_KEY || null
+    // Determine initial keys (localStorageのみ)
+    const geminiKey = storedGeminiKey || null
+    const openaiKey = storedOpenAIKey || null
 
     setSavedKeys({ gemini: geminiKey, openai: openaiKey })
 
@@ -161,52 +158,52 @@ export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
         <div className="flex gap-2 mb-4">
           <button
             onClick={() => handleProviderChange('gemini')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+            className={`flex-1 py-2 px-4 pixel-btn text-xs ${
               provider === 'gemini'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                ? 'bg-nes-purple border-purple-300 text-white'
+                : 'bg-gray-800 border-gray-600 text-gray-400'
             }`}
           >
-            Gemini
+            GEMINI
           </button>
           <button
             onClick={() => handleProviderChange('openai')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+            className={`flex-1 py-2 px-4 pixel-btn text-xs ${
               provider === 'openai'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                ? 'bg-nes-green border-green-300 text-white'
+                : 'bg-gray-800 border-gray-600 text-gray-400'
             }`}
           >
-            OpenAI
+            OPENAI
           </button>
         </div>
 
-        <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+        <div className="pixel-box border-green-500 bg-green-500/10 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-green-400">✓</span>
-              <span className="text-green-300">
-                {provider === 'gemini' ? 'Gemini' : 'OpenAI'} APIキー設定済み
+              <span className="nes-green">*</span>
+              <span className="text-green-300 text-xs">
+                {provider === 'gemini' ? 'GEMINI' : 'OPENAI'} KEY SET
               </span>
             </div>
             <button
               onClick={handleDelete}
-              className="text-sm text-gray-400 hover:text-red-400 transition-colors"
+              className="text-xs text-gray-400 hover:text-red-400 pixel-btn bg-gray-800 border-gray-600 px-2 py-1"
             >
-              削除
+              DEL
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 mt-2 font-mono">
             {currentSavedKey.slice(0, 10)}...{currentSavedKey.slice(-4)}
           </p>
           {provider === 'openai' && (
             <p className="text-xs text-gray-400 mt-2">
-              使用モデル: gpt-5-nano (Chat), text-embedding-3-small (Embedding)
+              &gt; MODEL: gpt-5-nano
             </p>
           )}
           {provider === 'gemini' && (
             <p className="text-xs text-gray-400 mt-2">
-              使用モデル: gemini-2.0-flash (Chat), text-embedding-004 (Embedding)
+              &gt; MODEL: gemini-2.0-flash
             </p>
           )}
         </div>
@@ -220,30 +217,30 @@ export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
       <div className="flex gap-2 mb-4">
         <button
           onClick={() => handleProviderChange('gemini')}
-          className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-2 px-4 pixel-btn text-xs ${
             provider === 'gemini'
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              ? 'bg-nes-purple border-purple-300 text-white'
+              : 'bg-gray-800 border-gray-600 text-gray-400'
           }`}
         >
-          Gemini
+          GEMINI
         </button>
         <button
           onClick={() => handleProviderChange('openai')}
-          className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-2 px-4 pixel-btn text-xs ${
             provider === 'openai'
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              ? 'bg-nes-green border-green-300 text-white'
+              : 'bg-gray-800 border-gray-600 text-gray-400'
           }`}
         >
-          OpenAI
+          OPENAI
         </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="apiKey" className="block text-sm font-medium text-gray-300 mb-2">
-            {provider === 'gemini' ? 'Gemini' : 'OpenAI'} APIキー
+          <label htmlFor="apiKey" className="block text-xs text-gray-300 mb-2">
+            &gt; {provider === 'gemini' ? 'GEMINI' : 'OPENAI'} API KEY
           </label>
           <input
             type="password"
@@ -251,9 +248,9 @@ export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder={provider === 'gemini' ? 'AIza...' : 'sk-...'}
-            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg
-                       text-gray-100 placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-4 py-3 pixel-box border-gray-600 bg-gray-800
+                       text-gray-100 placeholder-gray-500 text-xs
+                       focus:outline-none focus:border-nes-cyan"
           />
         </div>
 
@@ -263,36 +260,37 @@ export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
             id="saveKey"
             checked={saveToStorage}
             onChange={(e) => setSaveToStorage(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500"
+            className="w-4 h-4 accent-nes-purple"
           />
-          <label htmlFor="saveKey" className="text-sm text-gray-400">
-            ブラウザに保存する
+          <label htmlFor="saveKey" className="text-xs text-gray-400">
+            &gt; SAVE TO BROWSER
           </label>
         </div>
 
         {validationError && (
-          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-            <p className="text-red-400 text-sm">{validationError}</p>
+          <div className="p-3 pixel-box border-red-500 bg-red-500/10">
+            <p className="nes-red text-xs">&gt; ERROR: {validationError}</p>
           </div>
         )}
 
         <button
           type="submit"
           disabled={isValidating || !apiKey.trim()}
-          className={`w-full py-3 px-4 ${
+          className={`w-full py-3 px-4 pixel-btn text-white text-xs ${
             provider === 'gemini'
-              ? 'bg-purple-600 hover:bg-purple-700'
-              : 'bg-green-600 hover:bg-green-700'
-          } disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg
-                     transition-colors flex items-center justify-center gap-2`}
+              ? 'bg-nes-purple border-purple-300'
+              : 'bg-nes-green border-green-300'
+          } disabled:bg-gray-700 disabled:border-gray-600 disabled:cursor-not-allowed`}
         >
           {isValidating ? (
             <>
-              <span className="animate-spin">⏳</span>
-              検証中...
+              <span className="pixel-bounce inline-block">.</span>
+              <span className="pixel-bounce inline-block" style={{ animationDelay: '0.1s' }}>.</span>
+              <span className="pixel-bounce inline-block" style={{ animationDelay: '0.2s' }}>.</span>
+              CHECKING
             </>
           ) : (
-            'APIキーを設定'
+            '&gt; SET API KEY'
           )}
         </button>
       </form>
@@ -304,11 +302,10 @@ export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
               href="https://aistudio.google.com/app/apikey"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-400 hover:underline"
+              className="nes-cyan hover:underline"
             >
-              Google AI Studio
+              &gt; Google AI Studio
             </a>
-            でAPIキーを取得できます
           </>
         ) : (
           <>
@@ -316,11 +313,10 @@ export function ApiKeyManager({ onApiKeyChange }: ApiKeyManagerProps) {
               href="https://platform.openai.com/api-keys"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-400 hover:underline"
+              className="nes-cyan hover:underline"
             >
-              OpenAI Dashboard
+              &gt; OpenAI Dashboard
             </a>
-            でAPIキーを取得できます
           </>
         )}
       </p>

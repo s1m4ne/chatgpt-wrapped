@@ -15,7 +15,7 @@ export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
     if (!containerRef.current) return
 
     const canvas = await html2canvas(containerRef.current, {
-      backgroundColor: '#0f0f23',
+      backgroundColor: '#111827',
       scale: 2,
     })
 
@@ -32,42 +32,43 @@ export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
       {/* Preview container - 1:1 aspect ratio for SNS */}
       <div
         ref={containerRef}
-        className="aspect-square max-w-md mx-auto bg-gradient-to-br from-purple-900 via-gray-900 to-pink-900 rounded-2xl p-6 flex flex-col"
+        className="aspect-square max-w-md mx-auto pixel-box border-nes-purple bg-gray-900 p-4 flex flex-col"
+        style={{ fontFamily: "'Press Start 2P', monospace" }}
       >
         {/* Header */}
         <div className="text-center mb-4">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            My ChatGPT 2024
+          <h1 className="text-base nes-pink crt-glow">
+            ChatGPT 2024
           </h1>
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <StatBox icon="💬" value={stats.totalConversations.toLocaleString()} label="会話" />
-          <StatBox icon="📝" value={stats.totalMessages.toLocaleString()} label="メッセージ" />
-          <StatBox icon="📅" value={stats.activeDays.toString()} label="アクティブ日" />
-          <StatBox icon="🔥" value={`${stats.longestStreak}日`} label="連続記録" />
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <StatBox value={stats.totalConversations.toLocaleString()} label="CHATS" />
+          <StatBox value={stats.totalMessages.toLocaleString()} label="MSGS" />
+          <StatBox value={stats.activeDays.toString()} label="DAYS" />
+          <StatBox value={`${stats.longestStreak}`} label="STREAK" />
         </div>
 
         {/* Diagnosis type */}
         {diagnosis && (
-          <div className="bg-gray-800/50 rounded-xl p-4 mb-4 text-center">
-            <div className="text-sm text-gray-400 mb-1">あなたのタイプ</div>
-            <div className="text-xl font-bold text-purple-300">{diagnosis.type}</div>
-            <div className="text-sm text-pink-400 mt-1">{diagnosis.compatibilityScore}% マッチ</div>
+          <div className="pixel-box border-gray-600 bg-gray-800/50 p-3 mb-3 text-center">
+            <div className="text-xs text-gray-400 mb-1">&gt; TYPE</div>
+            <div className="text-xs nes-purple">{diagnosis.type}</div>
+            <div className="text-xs nes-pink mt-1">{diagnosis.compatibilityScore}%</div>
           </div>
         )}
 
         {/* Top topics */}
         {topTopics.length > 0 && (
-          <div className="bg-gray-800/50 rounded-xl p-4 flex-1">
-            <div className="text-sm text-gray-400 mb-2">Top Topics</div>
-            <div className="space-y-2">
+          <div className="pixel-box border-gray-600 bg-gray-800/50 p-3 flex-1">
+            <div className="text-xs text-gray-400 mb-2">&gt; TOPICS</div>
+            <div className="space-y-1">
               {topTopics.map((topic, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-lg">{topic.emoji}</span>
-                  <span className="text-sm text-gray-300 flex-1">{topic.name}</span>
-                  <span className="text-xs text-gray-500">{topic.percentage}%</span>
+                <div key={i} className="flex items-center gap-2 text-xs">
+                  <span>{topic.emoji}</span>
+                  <span className="text-gray-300 flex-1 truncate">{topic.name}</span>
+                  <span className="text-gray-500">{topic.percentage.toFixed(0)}%</span>
                 </div>
               ))}
             </div>
@@ -75,8 +76,8 @@ export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
         )}
 
         {/* Footer */}
-        <div className="mt-auto pt-4 text-center">
-          <div className="text-xs text-gray-500">ChatGPT Wrapped 2024</div>
+        <div className="mt-auto pt-3 text-center">
+          <div className="text-xs text-gray-600">WRAPPED 2024</div>
         </div>
       </div>
 
@@ -84,20 +85,19 @@ export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
       <div className="text-center">
         <button
           onClick={handleDownload}
-          className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-medium transition-all flex items-center gap-2 mx-auto"
+          className="px-4 py-2 pixel-btn bg-nes-purple border-purple-300 text-white text-xs"
         >
-          <span>📲</span> SNS用画像をダウンロード
+          &gt; DOWNLOAD PNG
         </button>
       </div>
     </div>
   )
 }
 
-function StatBox({ icon, value, label }: { icon: string; value: string; label: string }) {
+function StatBox({ value, label }: { value: string; label: string }) {
   return (
-    <div className="bg-gray-800/50 rounded-xl p-3 text-center">
-      <div className="text-xl mb-1">{icon}</div>
-      <div className="text-lg font-bold text-white">{value}</div>
+    <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+      <div className="text-sm text-white">{value}</div>
       <div className="text-xs text-gray-400">{label}</div>
     </div>
   )

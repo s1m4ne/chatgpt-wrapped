@@ -86,12 +86,12 @@ export function FileUploader({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          relative border-2 border-dashed rounded-xl p-12 text-center
-          transition-all duration-200 cursor-pointer
+          relative pixel-box p-8 sm:p-12 text-center cursor-pointer
+          transition-all duration-100
           ${
             isDragging
-              ? 'border-purple-500 bg-purple-500/10'
-              : 'border-gray-600 hover:border-gray-500 hover:bg-gray-800/50'
+              ? 'border-nes-cyan bg-nes-cyan/10'
+              : 'border-gray-600 hover:border-nes-purple hover:bg-nes-purple/5'
           }
         `}
       >
@@ -103,26 +103,31 @@ export function FileUploader({
         />
 
         <div className="space-y-4">
-          <div className="text-5xl">
-            {isDragging ? '📂' : '📁'}
+          {/* Pixel art folder icon */}
+          <div className="text-4xl" style={{ imageRendering: 'pixelated' }}>
+            {isDragging ? (
+              <span className="nes-cyan">[OPEN]</span>
+            ) : (
+              <span className="text-gray-400">[FILE]</span>
+            )}
           </div>
           <div>
-            <p className="text-lg font-medium text-gray-200">
-              {isDragging ? 'ドロップしてアップロード' : 'conversations.json をドラッグ&ドロップ'}
+            <p className="text-xs sm:text-sm text-gray-200">
+              {isDragging ? '&gt; DROP HERE!' : '&gt; conversations.json'}
             </p>
-            <p className="text-sm text-gray-400 mt-1">
-              または<span className="text-purple-400 underline">クリックしてファイルを選択</span>
+            <p className="text-xs text-gray-500 mt-2">
+              {isDragging ? '' : '&gt; DRAG & DROP or CLICK'}
             </p>
           </div>
-          <p className="text-xs text-gray-500">
-            最大ファイルサイズ: {maxSizeMB}MB
+          <p className="text-xs text-gray-600">
+            MAX: {maxSizeMB}MB
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-          <p className="text-red-400 text-sm">{error}</p>
+        <div className="mt-4 p-3 pixel-box border-red-500 bg-red-500/10">
+          <p className="nes-red text-xs">&gt; ERROR: {error}</p>
         </div>
       )}
     </div>

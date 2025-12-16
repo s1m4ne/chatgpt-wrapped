@@ -21,10 +21,17 @@ export interface ActivityPattern {
   yearlyHeatmaps: YearlyHeatmap[]
 }
 
+export interface DailyData {
+  count: number
+  conversationIds: string[]
+}
+
 export interface YearlyHeatmap {
   year: number
-  // Map of date string (YYYY-MM-DD) to message count
+  // Map of date string (YYYY-MM-DD) to daily data
   dailyCounts: Record<string, number>
+  // Map of date string (YYYY-MM-DD) to conversation IDs for that day
+  dailyConversations: Record<string, string[]>
 }
 
 export interface MonthlyCount {

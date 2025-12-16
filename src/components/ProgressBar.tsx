@@ -6,40 +6,55 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ progress, currentStep, onRetry, hasError }: ProgressBarProps) {
+  // Create pixel blocks for progress bar
+  const totalBlocks = 20
+  const filledBlocks = Math.round((progress / 100) * totalBlocks)
+
   return (
     <div className="w-full max-w-xl mx-auto">
-      <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+      <div className="pixel-box border-gray-600 bg-gray-800/50 p-6">
         {/* Progress Bar */}
         <div className="mb-4">
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-400">分析進行中</span>
-            <span className="text-purple-400">{Math.round(progress)}%</span>
+          <div className="flex justify-between text-xs mb-2">
+            <span className="text-gray-400">&gt; ANALYZING</span>
+            <span className="nes-cyan">{Math.round(progress)}%</span>
           </div>
-          <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
+          {/* Pixel-style progress bar */}
+          <div className="flex gap-0.5">
+            {Array.from({ length: totalBlocks }, (_, i) => (
+              <div
+                key={i}
+                className={`h-4 flex-1 ${
+                  i < filledBlocks
+                    ? i < filledBlocks / 2
+                      ? 'bg-nes-green'
+                      : 'bg-nes-cyan'
+                    : 'bg-gray-700'
+                }`}
+                style={{ imageRendering: 'pixelated' }}
+              />
+            ))}
           </div>
         </div>
 
         {/* Current Step */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-xs">
           {hasError ? (
-            <span className="text-red-400">❌</span>
+            <span className="nes-red">[X]</span>
           ) : (
-            <span className="animate-spin">⏳</span>
+            <span className="nes-yellow pixel-bounce">&gt;</span>
           )}
-          <span className={hasError ? 'text-red-400' : 'text-gray-300'}>{currentStep}</span>
+          <span className={hasError ? 'nes-red' : 'text-gray-300'}>{currentStep}</span>
+          {!hasError && <span className="blink">_</span>}
         </div>
 
         {/* Retry Button */}
         {hasError && onRetry && (
           <button
             onClick={onRetry}
-            className="mt-4 w-full py-2 px-4 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 rounded-lg transition-colors"
+            className="mt-4 w-full py-2 px-4 pixel-btn bg-nes-red border-red-300 text-white text-xs"
           >
-            再試行
+            &gt; RETRY
           </button>
         )}
       </div>

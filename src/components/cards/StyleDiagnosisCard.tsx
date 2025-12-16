@@ -5,40 +5,48 @@ interface StyleDiagnosisCardProps {
 }
 
 export function StyleDiagnosisCard({ data }: StyleDiagnosisCardProps) {
+  // Create pixel bar for score
+  const totalBlocks = 20
+  const filledBlocks = Math.round((data.compatibilityScore / 100) * totalBlocks)
+
   return (
-    <div className="bg-gradient-to-br from-rose-900/50 to-pink-900/50 rounded-2xl p-8 backdrop-blur-sm border border-rose-500/20">
-      <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-rose-400 to-pink-400 bg-clip-text text-transparent">
-        GPTスタイル診断
+    <div className="pixel-box border-nes-pink bg-gray-900/80 p-4 sm:p-6">
+      <h2 className="text-sm sm:text-base text-center mb-4 nes-pink crt-glow">
+        GPT STYLE
       </h2>
 
-      <div className="text-center mb-8">
-        <p className="text-gray-400 text-sm">あなたのChatGPT活用タイプは...</p>
+      <div className="text-center mb-6">
+        <p className="text-gray-400 text-xs">&gt; あなたのタイプは...</p>
       </div>
 
       {/* Type Badge */}
-      <div className="text-center mb-8">
-        <div className="inline-block px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full">
-          <span className="text-2xl font-bold text-white">{data.type}</span>
+      <div className="text-center mb-6">
+        <div className="inline-block px-4 py-2 pixel-box border-pink-400 bg-nes-pink">
+          <span className="text-sm sm:text-base text-white">{data.type}</span>
         </div>
       </div>
 
-      {/* Compatibility Score */}
-      <div className="mb-8">
-        <div className="flex justify-between text-sm mb-2">
-          <span className="text-gray-400">GPTとの相性</span>
-          <span className="text-rose-400 font-bold">{data.compatibilityScore}%</span>
+      {/* Compatibility Score - Pixel Bar */}
+      <div className="mb-6">
+        <div className="flex justify-between text-xs mb-2">
+          <span className="text-gray-400">&gt; GPT SYNC</span>
+          <span className="nes-pink">{data.compatibilityScore}%</span>
         </div>
-        <div className="h-4 bg-gray-700 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full transition-all duration-1000"
-            style={{ width: `${data.compatibilityScore}%` }}
-          />
+        <div className="flex gap-0.5">
+          {Array.from({ length: totalBlocks }, (_, i) => (
+            <div
+              key={i}
+              className={`h-4 flex-1 ${
+                i < filledBlocks ? 'bg-nes-pink' : 'bg-gray-700'
+              }`}
+            />
+          ))}
         </div>
       </div>
 
       {/* Description */}
-      <div className="bg-gray-800/50 rounded-lg p-4">
-        <p className="text-gray-300 text-sm leading-relaxed">{data.description}</p>
+      <div className="pixel-box border-gray-600 bg-gray-800/50 p-3">
+        <p className="text-gray-300 text-xs leading-relaxed">{data.description}</p>
       </div>
     </div>
   )

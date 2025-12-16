@@ -6,30 +6,30 @@ interface BestQuotesCardProps {
 
 export function BestQuotesCard({ data }: BestQuotesCardProps) {
   return (
-    <div className="bg-gradient-to-br from-teal-900/50 to-cyan-900/50 rounded-2xl p-8 backdrop-blur-sm border border-teal-500/20">
-      <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
-        今年の名言集
+    <div className="pixel-box border-nes-cyan bg-gray-900/80 p-4 sm:p-6">
+      <h2 className="text-sm sm:text-base text-center mb-6 nes-cyan crt-glow">
+        QUOTES
       </h2>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {data.slice(0, 5).map((quote, i) => (
-          <div key={i} className="bg-gray-800/50 rounded-lg p-6">
+          <div key={i} className="pixel-box border-gray-600 bg-gray-800/50 p-4">
             {/* Quote */}
-            <blockquote className="relative">
-              <span className="absolute -top-2 -left-2 text-4xl text-teal-500/30">"</span>
-              <p className="text-lg text-gray-200 italic pl-6 pr-4">{quote.quote}</p>
-              <span className="absolute -bottom-4 -right-2 text-4xl text-teal-500/30">"</span>
-            </blockquote>
+            <div className="mb-3">
+              <span className="nes-cyan text-xs">"</span>
+              <p className="text-xs text-gray-200 inline">{quote.quote}</p>
+              <span className="nes-cyan text-xs">"</span>
+            </div>
 
             {/* Context & Reason */}
-            <div className="mt-6 pt-4 border-t border-gray-700/50">
-              <div className="flex items-start gap-2 mb-2">
-                <span className="text-cyan-400 text-sm">📝</span>
-                <p className="text-sm text-gray-400">{quote.context}</p>
+            <div className="pt-3 border-t-2 border-gray-700 space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="text-xs text-gray-500">&gt;</span>
+                <p className="text-xs text-gray-400">{quote.context}</p>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-teal-400 text-sm">💡</span>
-                <p className="text-sm text-teal-300">{quote.reason}</p>
+                <span className="text-xs nes-cyan">&gt;</span>
+                <p className="text-xs text-teal-300">{quote.reason}</p>
               </div>
             </div>
           </div>

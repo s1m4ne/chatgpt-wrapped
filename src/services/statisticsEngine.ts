@@ -121,6 +121,8 @@ export function calculateActivityPattern(conversations: Conversation[]): Activit
   const weekdayCounts: number[] = Array(7).fill(0)
   // Year -> date -> count
   const yearlyDailyMap = new Map<number, Map<string, number>>()
+  // Year -> date -> conversationIds (Set to avoid duplicates)
+  const yearlyDailyConvMap = new Map<number, Map<string, Set<string>>>()
 
   for (const conv of conversations) {
     for (const msg of conv.messages) {
@@ -141,6 +143,16 @@ export function calculateActivityPattern(conversations: Conversation[]): Activit
       }
       const dailyMap = yearlyDailyMap.get(year)!
       dailyMap.set(dateKey, (dailyMap.get(dateKey) || 0) + 1)
+
+      // Track conversation IDs per day
+      if (!yearlyDailyConvMap.has(year)) {
+        yearlyDailyConvMap.set(year, new Map())
+      }
+      const dailyConvMap = yearlyDailyConvMap.get(year)!
+      if (!dailyConvMap.has(dateKey)) {
+        dailyConvMap.set(dateKey, new Set())
+      }
+      dailyConvMap.get(dateKey)!.add(conv.id)
     }
   }
 
@@ -157,10 +169,18 @@ export function calculateActivityPattern(conversations: Conversation[]): Activit
 
   // Convert yearly daily map to YearlyHeatmap array
   const yearlyHeatmaps: YearlyHeatmap[] = Array.from(yearlyDailyMap.entries())
-    .map(([year, dailyMap]) => ({
-      year,
-      dailyCounts: Object.fromEntries(dailyMap),
-    }))
+    .map(([year, dailyMap]) => {
+      const dailyConvMap = yearlyDailyConvMap.get(year) || new Map()
+      const dailyConversations: Record<string, string[]> = {}
+      for (const [dateKey, convSet] of dailyConvMap.entries()) {
+        dailyConversations[dateKey] = Array.from(convSet)
+      }
+      return {
+        year,
+        dailyCounts: Object.fromEntries(dailyMap),
+        dailyConversations,
+      }
+    })
     .sort((a, b) => b.year - a.year) // Most recent year first
 
   return {

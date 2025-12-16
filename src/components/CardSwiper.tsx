@@ -42,17 +42,18 @@ export function CardSwiper({ children }: CardSwiperProps) {
 
   return (
     <div className="relative">
-      {/* Navigation Dots */}
-      <div className="flex justify-center gap-1.5 sm:gap-2 mb-4 sm:mb-6 flex-wrap">
+      {/* Navigation Dots - Pixel Style */}
+      <div className="flex justify-center gap-1 sm:gap-1.5 mb-4 sm:mb-6 flex-wrap">
         {children.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrentIndex(i)}
-            className={`h-2 rounded-full transition-all ${
+            className={`h-2 transition-all ${
               i === currentIndex
-                ? 'bg-purple-500 w-4 sm:w-6'
-                : 'bg-gray-600 hover:bg-gray-500 w-2'
+                ? 'bg-nes-cyan w-4 sm:w-6'
+                : 'bg-gray-700 hover:bg-gray-600 w-2'
             }`}
+            style={{ imageRendering: 'pixelated' }}
           />
         ))}
       </div>
@@ -65,7 +66,7 @@ export function CardSwiper({ children }: CardSwiperProps) {
         onTouchEnd={handleTouchEnd}
       >
         <div
-          className="flex transition-transform duration-500 ease-out"
+          className="flex transition-transform duration-300"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
           {children.map((child, i) => (
@@ -76,30 +77,30 @@ export function CardSwiper({ children }: CardSwiperProps) {
         </div>
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between mt-4 sm:mt-6 gap-4">
+      {/* Navigation Buttons - Pixel Style */}
+      <div className="flex justify-between mt-4 sm:mt-6 gap-2 sm:gap-4">
         <button
           onClick={goToPrev}
           disabled={currentIndex === 0}
-          className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 pixel-btn bg-gray-800 border-gray-600 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>←</span> <span className="hidden sm:inline">前へ</span>
+          &lt; <span className="hidden sm:inline">PREV</span>
         </button>
-        <span className="text-gray-500 text-sm self-center">
-          {currentIndex + 1} / {children.length}
+        <span className="text-gray-500 text-xs self-center">
+          [{currentIndex + 1}/{children.length}]
         </span>
         <button
           onClick={goToNext}
           disabled={currentIndex === children.length - 1}
-          className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 pixel-btn bg-nes-purple border-purple-300 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="hidden sm:inline">次へ</span> <span>→</span>
+          <span className="hidden sm:inline">NEXT</span> &gt;
         </button>
       </div>
 
       {/* Swipe hint for mobile */}
-      <div className="text-center text-xs text-gray-500 mt-3 sm:hidden">
-        ← スワイプで移動 →
+      <div className="text-center text-xs text-gray-600 mt-3 sm:hidden">
+        &lt; SWIPE &gt;
       </div>
     </div>
   )

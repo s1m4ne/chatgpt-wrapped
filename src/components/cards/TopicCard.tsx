@@ -1,79 +1,88 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import type { TopicClassification } from '../../types'
 
 interface TopicCardProps {
   data: TopicClassification
 }
 
-const COLORS = [
-  '#a855f7',
-  '#ec4899',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#06b6d4',
-  '#3b82f6',
-  '#8b5cf6',
-  '#f43f5e',
-  '#14b8a6',
+const PIXEL_COLORS = [
+  '#ff004d', // nes-red
+  '#ff77a8', // nes-pink
+  '#ffa300', // nes-orange
+  '#ffec27', // nes-yellow
+  '#00e436', // nes-green
+  '#29adff', // nes-cyan
+  '#7e2553', // nes-purple
+  '#1d2b53', // nes-blue
+  '#ff6b9d',
+  '#83769c',
 ]
 
 export function TopicCard({ data }: TopicCardProps) {
-  const chartData = data.topics.slice(0, 10).map((t) => ({
-    name: `${t.emoji} ${t.name}`,
-    value: t.percentage,
-  }))
+  const maxPercentage = Math.max(...data.topics.map((t) => t.percentage))
 
   return (
-    <div className="bg-gradient-to-br from-purple-900/50 to-fuchsia-900/50 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/20">
-      <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-        話題のトピックTOP10
+    <div className="pixel-box border-nes-purple bg-gray-900/80 p-4 sm:p-6">
+      <h2 className="text-sm sm:text-base text-center mb-6 nes-purple crt-glow">
+        TOPICS TOP10
       </h2>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Pie Chart */}
-        <div className="w-full md:w-1/2 h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={chartData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={80}
-                paddingAngle={2}
-              >
-                {chartData.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1f2937',
-                  border: 'none',
-                  borderRadius: '8px',
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      {/* Pixel Bar Chart */}
+      <div className="space-y-2">
+        {data.topics.slice(0, 10).map((topic, i) => {
+          const barWidth = (topic.percentage / maxPercentage) * 100
+          const totalBlocks = 15
+          const filledBlocks = Math.round((barWidth / 100) * totalBlocks)
 
-        {/* Legend */}
-        <div className="w-full md:w-1/2 space-y-2">
-          {data.topics.slice(0, 10).map((topic, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: COLORS[i % COLORS.length] }}
-                />
-                <span className="text-sm text-gray-300">
-                  {topic.emoji} {topic.name}
-                </span>
+          return (
+            <div key={i} className="flex items-center gap-2">
+              {/* Rank */}
+              <div className="w-6 text-xs text-gray-500 text-right">
+                {i + 1}.
               </div>
-              <span className="text-sm text-gray-400">{topic.percentage.toFixed(1)}%</span>
+
+              {/* Label */}
+              <div className="w-20 sm:w-28 text-xs text-gray-300 truncate">
+                {topic.emoji} {topic.name}
+              </div>
+
+              {/* Pixel Bar */}
+              <div className="flex-1 flex gap-px">
+                {Array.from({ length: totalBlocks }, (_, blockIndex) => (
+                  <div
+                    key={blockIndex}
+                    className="h-3 flex-1"
+                    style={{
+                      backgroundColor:
+                        blockIndex < filledBlocks
+                          ? PIXEL_COLORS[i % PIXEL_COLORS.length]
+                          : '#374151',
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Percentage */}
+              <div
+                className="w-12 text-xs text-right"
+                style={{ color: PIXEL_COLORS[i % PIXEL_COLORS.length] }}
+              >
+                {topic.percentage.toFixed(1)}%
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Legend dots */}
+      <div className="mt-4 pt-4 border-t-2 border-gray-700">
+        <div className="flex flex-wrap gap-2 justify-center">
+          {data.topics.slice(0, 5).map((topic, i) => (
+            <div key={i} className="flex items-center gap-1">
+              <div
+                className="w-2 h-2"
+                style={{ backgroundColor: PIXEL_COLORS[i % PIXEL_COLORS.length] }}
+              />
+              <span className="text-xs text-gray-400">{topic.name}</span>
             </div>
           ))}
         </div>

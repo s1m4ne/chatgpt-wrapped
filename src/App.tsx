@@ -97,23 +97,26 @@ function App() {
       return (
         <div className="space-y-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl mb-4 pixel-gradient crt-glow">
               ChatGPT Wrapped
             </h1>
-            <p className="text-gray-400">あなたの1年間のChatGPT利用を振り返ろう</p>
+            <p className="text-xs sm:text-sm text-gray-400">
+              &gt; あなたの1年間のChatGPT利用を振り返ろう_<span className="blink">|</span>
+            </p>
           </div>
 
           {state.error && (
-            <div className="max-w-xl mx-auto p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-              <p className="text-red-400">{state.error}</p>
+            <div className="max-w-xl mx-auto p-4 pixel-box border-red-500 bg-red-500/20">
+              <p className="text-red-400 text-xs">{state.error}</p>
             </div>
           )}
 
           <FileUploader onFileSelect={handleFileSelect} />
 
-          <div className="text-center text-sm text-gray-500">
-            <p>ChatGPTの設定 → データエクスポートから</p>
-            <p>conversations.json をダウンロードしてください</p>
+          <div className="text-center text-xs text-gray-500 space-y-1">
+            <p>&gt; ChatGPTの設定</p>
+            <p>&gt; データエクスポートから</p>
+            <p>&gt; conversations.json をDL</p>
           </div>
         </div>
       )
@@ -124,11 +127,11 @@ function App() {
       return (
         <div className="space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              データ読み込み完了!
+            <h1 className="text-xl sm:text-2xl mb-2 pixel-gradient crt-glow">
+              DATA LOADED!
             </h1>
-            <p className="text-gray-400">
-              {state.conversations.length}件の会話が見つかりました
+            <p className="text-xs text-gray-400">
+              &gt; {state.conversations.length}件の会話を発見_<span className="blink">|</span>
             </p>
           </div>
 
@@ -145,13 +148,13 @@ function App() {
             {apiKeyState.apiKey && (
               <button
                 onClick={handleStartAnalysis}
-                className={`w-full py-4 px-6 ${
+                className={`w-full py-4 px-6 pixel-btn text-white text-xs sm:text-sm ${
                   apiKeyState.provider === 'gemini'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
-                    : 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700'
-                } text-white font-bold rounded-xl transition-all transform hover:scale-105`}
+                    ? 'bg-nes-purple border-purple-300'
+                    : 'bg-nes-green border-green-300'
+                }`}
               >
-                {apiKeyState.provider === 'gemini' ? 'Gemini' : 'OpenAI'}で分析を開始 ✨
+                &gt; {apiKeyState.provider === 'gemini' ? 'GEMINI' : 'OPENAI'}で分析開始
               </button>
             )}
           </div>
@@ -164,10 +167,12 @@ function App() {
       return (
         <div className="space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              分析中...
+            <h1 className="text-xl sm:text-2xl mb-2 pixel-gradient crt-glow">
+              ANALYZING...
             </h1>
-            <p className="text-gray-400">AIがあなたの会話を分析しています</p>
+            <p className="text-xs text-gray-400">
+              &gt; AIがあなたの会話を分析中<span className="blink">_</span>
+            </p>
           </div>
 
           <ProgressBar
@@ -239,10 +244,12 @@ function App() {
       return (
         <div className="space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              あなたの2024年
+            <h1 className="text-xl sm:text-2xl mb-2 pixel-gradient crt-glow">
+              YOUR 2024
             </h1>
-            <p className="text-gray-400">ChatGPTとの1年間を振り返ろう</p>
+            <p className="text-xs text-gray-400">
+              &gt; ChatGPTとの1年間_<span className="blink">|</span>
+            </p>
           </div>
 
           <CardSwiper>{cards}</CardSwiper>
@@ -250,9 +257,9 @@ function App() {
           <div className="text-center">
             <button
               onClick={() => dispatch({ type: 'RESET' })}
-              className="text-sm text-gray-500 hover:text-gray-400"
+              className="text-xs text-gray-500 hover:text-nes-cyan pixel-btn bg-gray-800 border-gray-600 px-4 py-2"
             >
-              最初からやり直す
+              &gt; RESTART
             </button>
           </div>
         </div>
@@ -263,13 +270,13 @@ function App() {
     if (state.status === 'error') {
       return (
         <div className="text-center space-y-4">
-          <div className="text-red-400 text-xl">エラーが発生しました</div>
-          <p className="text-gray-400">{state.error}</p>
+          <div className="text-xl nes-red crt-glow">ERROR!</div>
+          <p className="text-xs text-gray-400">&gt; {state.error}</p>
           <button
             onClick={() => dispatch({ type: 'RESET' })}
-            className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg"
+            className="px-6 py-2 pixel-btn bg-gray-700 border-gray-500 text-xs"
           >
-            最初からやり直す
+            &gt; RESTART
           </button>
         </div>
       )
@@ -279,7 +286,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen py-6 sm:py-12 px-2 sm:px-4">
+    <div className="min-h-screen py-6 sm:py-12 px-2 sm:px-4 relative scanlines">
       <div className="max-w-4xl mx-auto">{renderContent()}</div>
     </div>
   )

@@ -6,22 +6,20 @@ interface WritingStyleCardProps {
 
 export function WritingStyleCard({ data }: WritingStyleCardProps) {
   return (
-    <div className="bg-gradient-to-br from-indigo-900/50 to-violet-900/50 rounded-2xl p-8 backdrop-blur-sm border border-indigo-500/20">
-      <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-        あなたの文章スタイル
+    <div className="pixel-box border-nes-purple bg-gray-900/80 p-4 sm:p-6">
+      <h2 className="text-sm sm:text-base text-center mb-6 nes-purple crt-glow">
+        STYLE
       </h2>
 
-      <div className="grid gap-6">
+      <div className="space-y-4">
         {/* Characteristics */}
-        <div className="bg-gray-800/50 rounded-lg p-4">
-          <h3 className="text-sm text-indigo-400 font-medium mb-3 flex items-center gap-2">
-            <span>✍️</span> 文章の特徴
-          </h3>
+        <div className="pixel-box border-gray-600 bg-gray-800/50 p-3">
+          <h3 className="text-xs text-indigo-400 mb-3">&gt; TRAITS</h3>
           <div className="flex flex-wrap gap-2">
             {data.characteristics.map((char, i) => (
               <span
                 key={i}
-                className="px-3 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-300 text-sm"
+                className="px-2 py-1 bg-indigo-500/20 text-indigo-300 text-xs"
               >
                 {char}
               </span>
@@ -30,15 +28,13 @@ export function WritingStyleCard({ data }: WritingStyleCardProps) {
         </div>
 
         {/* Emotional Tendency */}
-        <div className="bg-gray-800/50 rounded-lg p-4">
-          <h3 className="text-sm text-violet-400 font-medium mb-3 flex items-center gap-2">
-            <span>💭</span> 感情傾向
-          </h3>
+        <div className="pixel-box border-gray-600 bg-gray-800/50 p-3">
+          <h3 className="text-xs text-violet-400 mb-3">&gt; EMOTION</h3>
           <div className="flex flex-wrap gap-2">
             {data.emotionalTendency.map((emotion, i) => (
               <span
                 key={i}
-                className="px-3 py-1 bg-violet-500/20 border border-violet-500/30 rounded-full text-violet-300 text-sm"
+                className="px-2 py-1 bg-violet-500/20 text-violet-300 text-xs"
               >
                 {emotion}
               </span>
@@ -47,14 +43,12 @@ export function WritingStyleCard({ data }: WritingStyleCardProps) {
         </div>
 
         {/* Question Patterns */}
-        <div className="bg-gray-800/50 rounded-lg p-4">
-          <h3 className="text-sm text-purple-400 font-medium mb-3 flex items-center gap-2">
-            <span>❓</span> 質問パターン
-          </h3>
-          <ul className="space-y-2">
+        <div className="pixel-box border-gray-600 bg-gray-800/50 p-3">
+          <h3 className="text-xs text-purple-400 mb-3">&gt; Q PATTERNS</h3>
+          <ul className="space-y-1">
             {data.questionPatterns.map((pattern, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
-                <span className="text-purple-400 mt-1">•</span>
+              <li key={i} className="flex items-start gap-2 text-xs text-gray-300">
+                <span className="text-purple-400">&gt;</span>
                 {pattern}
               </li>
             ))}

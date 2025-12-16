@@ -6,23 +6,23 @@ interface WordAnalysisCardProps {
 
 export function WordAnalysisCard({ data }: WordAnalysisCardProps) {
   return (
-    <div className="bg-gradient-to-br from-blue-900/50 to-cyan-900/50 rounded-2xl p-8 backdrop-blur-sm border border-blue-500/20">
-      <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-        よく使った言葉
+    <div className="pixel-box border-nes-cyan bg-gray-900/80 p-4 sm:p-6">
+      <h2 className="text-sm sm:text-base text-center mb-6 nes-cyan crt-glow">
+        WORDS
       </h2>
 
       <div className="space-y-6">
         {/* Top Words */}
         <div>
-          <h3 className="text-sm text-gray-400 mb-3">頻出ワードTOP10</h3>
+          <h3 className="text-xs text-gray-400 mb-3">&gt; TOP 10 WORDS</h3>
           <div className="flex flex-wrap gap-2">
             {data.topWords.slice(0, 10).map((item, i) => (
               <span
                 key={i}
-                className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-300 text-sm"
+                className="px-2 py-1 pixel-box border-cyan-600 bg-cyan-500/20 text-cyan-300 text-xs"
               >
                 {item.word}
-                <span className="ml-1 text-blue-500">{item.count}</span>
+                <span className="ml-1 nes-cyan">{item.count}</span>
               </span>
             ))}
           </div>
@@ -30,11 +30,11 @@ export function WordAnalysisCard({ data }: WordAnalysisCardProps) {
 
         {/* Phrases */}
         <div>
-          <h3 className="text-sm text-gray-400 mb-3">口癖・頻出フレーズ</h3>
+          <h3 className="text-xs text-gray-400 mb-3">&gt; PHRASES</h3>
           <div className="space-y-2">
             {data.phrases.slice(0, 5).map((phrase, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span className="text-cyan-400">💬</span>
+              <div key={i} className="flex items-center gap-2 text-xs">
+                <span className="nes-cyan">&gt;</span>
                 <span className="text-gray-200">"{phrase}"</span>
               </div>
             ))}
@@ -43,13 +43,12 @@ export function WordAnalysisCard({ data }: WordAnalysisCardProps) {
 
         {/* Important Words */}
         <div>
-          <h3 className="text-sm text-gray-400 mb-3">重要キーワード</h3>
+          <h3 className="text-xs text-gray-400 mb-3">&gt; KEYWORDS</h3>
           <div className="flex flex-wrap gap-2">
             {data.importantWords.slice(0, 8).map((item, i) => (
               <span
                 key={i}
-                className="px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-300 text-sm"
-                style={{ fontSize: `${0.8 + item.tfidf * 0.3}rem` }}
+                className="px-2 py-1 pixel-box border-teal-600 bg-teal-500/20 text-teal-300 text-xs"
               >
                 {item.word}
               </span>

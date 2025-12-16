@@ -26,84 +26,90 @@ export function StatsCard({ stats }: StatsCardProps) {
     (Date.now() - stats.dateRange.start.getTime()) / (1000 * 60 * 60 * 24)
   )
 
+  // Create pixel bar for ratio
+  const totalBlocks = 20
+  const userBlocks = Math.round((userRatio / 100) * totalBlocks)
+
   return (
-    <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-2xl p-4 sm:p-8 backdrop-blur-sm border border-purple-500/20">
+    <div className="pixel-box border-nes-purple bg-gray-900/80 p-4 sm:p-6">
       {/* Header with date range */}
       <div className="text-center mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          あなたの利用サマリー
+        <h2 className="text-sm sm:text-base mb-4 nes-pink crt-glow">
+          YOUR STATS
         </h2>
-        <div className="bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-xl py-4 px-6 mb-3 border border-purple-500/30">
-          <p className="text-gray-400 text-xs mb-1">ChatGPTと出会って</p>
-          <p className="text-3xl sm:text-4xl font-bold text-white">
-            {formatNumber(daysSinceFirstUse)} <span className="text-lg text-pink-400">日</span>
+        <div className="pixel-box border-purple-500 bg-purple-900/30 py-4 px-4 mb-3">
+          <p className="text-gray-400 text-xs mb-1">&gt; ChatGPTと出会って</p>
+          <p className="text-2xl sm:text-3xl text-white">
+            {formatNumber(daysSinceFirstUse)} <span className="text-xs nes-pink">DAYS</span>
           </p>
         </div>
         <p className="text-xs text-gray-500">
-          {formatDate(stats.dateRange.start)} 〜 {formatDate(stats.dateRange.end)}
+          {formatDate(stats.dateRange.start)} - {formatDate(stats.dateRange.end)}
         </p>
       </div>
 
       {/* Main Stats - Hero Section */}
-      <div className="bg-gray-800/40 rounded-xl p-4 sm:p-6 mb-4">
+      <div className="pixel-box border-gray-600 bg-gray-800/40 p-4 mb-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="text-center">
-            <div className="text-3xl sm:text-5xl font-bold text-white mb-1">
+            <div className="text-xl sm:text-3xl text-white mb-1">
               {formatNumber(stats.totalConversations)}
             </div>
-            <div className="text-sm text-gray-400">チャットスレッド</div>
-            <div className="text-xs text-gray-500 mt-1">新規チャットを開いた回数</div>
+            <div className="text-xs text-gray-400">THREADS</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl sm:text-5xl font-bold text-white mb-1">
+            <div className="text-xl sm:text-3xl text-white mb-1">
               {formatNumber(stats.totalMessages)}
             </div>
-            <div className="text-sm text-gray-400">総メッセージ</div>
-            <div className="text-xs text-gray-500 mt-1">やり取りしたメッセージ総数</div>
+            <div className="text-xs text-gray-400">MESSAGES</div>
           </div>
         </div>
 
-        {/* Message breakdown bar */}
-        <div className="mt-4 pt-4 border-t border-gray-700/50">
+        {/* Message breakdown bar - pixel style */}
+        <div className="mt-4 pt-4 border-t-2 border-gray-700">
           <div className="flex justify-between text-xs text-gray-400 mb-2">
-            <span>あなた: {formatNumber(stats.userMessages)}件</span>
-            <span>ChatGPT: {formatNumber(stats.assistantMessages)}件</span>
+            <span>YOU: {formatNumber(stats.userMessages)}</span>
+            <span>GPT: {formatNumber(stats.assistantMessages)}</span>
           </div>
-          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
-              style={{ width: `${userRatio}%` }}
-            />
+          <div className="flex gap-0.5">
+            {Array.from({ length: totalBlocks }, (_, i) => (
+              <div
+                key={i}
+                className={`h-3 flex-1 ${
+                  i < userBlocks ? 'bg-nes-purple' : 'bg-nes-cyan'
+                }`}
+              />
+            ))}
           </div>
         </div>
       </div>
 
       {/* Secondary Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-          <div className="text-lg sm:text-2xl font-bold text-purple-300">
+      <div className="grid grid-cols-3 gap-2">
+        <div className="pixel-box border-gray-600 bg-gray-800/30 p-2 text-center">
+          <div className="text-sm sm:text-lg nes-purple">
             {avgMessagesPerConv}
           </div>
-          <div className="text-xs text-gray-400">平均往復/会話</div>
+          <div className="text-xs text-gray-400">AVG/CHAT</div>
         </div>
-        <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-          <div className="text-lg sm:text-2xl font-bold text-blue-300">
-            {formatNumber(stats.activeDays)}日
+        <div className="pixel-box border-gray-600 bg-gray-800/30 p-2 text-center">
+          <div className="text-sm sm:text-lg nes-cyan">
+            {formatNumber(stats.activeDays)}
           </div>
-          <div className="text-xs text-gray-400">利用日数</div>
+          <div className="text-xs text-gray-400">DAYS</div>
         </div>
-        <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-          <div className="text-lg sm:text-2xl font-bold text-orange-300">
-            {stats.longestStreak}日
+        <div className="pixel-box border-gray-600 bg-gray-800/30 p-2 text-center">
+          <div className="text-sm sm:text-lg nes-orange">
+            {stats.longestStreak}
           </div>
-          <div className="text-xs text-gray-400">最長連続</div>
+          <div className="text-xs text-gray-400">STREAK</div>
         </div>
       </div>
 
       {/* Token info */}
       <div className="mt-4 text-center">
         <span className="text-xs text-gray-500">
-          推定トークン使用量: {formatNumber(stats.estimatedTokens)}
+          &gt; TOKENS: {formatNumber(stats.estimatedTokens)}
         </span>
       </div>
     </div>

@@ -101,7 +101,13 @@ function App() {
               ChatGPT Wrapped
             </h1>
             <p className="text-xs sm:text-sm text-gray-400">
-              &gt; あなたの1年間のChatGPT利用を振り返ろう_<span className="blink">|</span>
+              &gt; あなたの今までのChatGPT利用を振り返ろう_<span className="blink">|</span>
+            </p>
+          </div>
+
+          <div className="max-w-xl mx-auto text-center">
+            <p className="text-sm sm:text-base text-nes-cyan mb-4">
+              ChatGPTから会話履歴をエクスポートしてアップロードしよう！
             </p>
           </div>
 
@@ -113,10 +119,17 @@ function App() {
 
           <FileUploader onFileSelect={handleFileSelect} />
 
-          <div className="text-center text-xs text-gray-500 space-y-1">
-            <p>&gt; ChatGPTの設定</p>
-            <p>&gt; データエクスポートから</p>
-            <p>&gt; conversations.json をDL</p>
+          <div className="max-w-xl mx-auto pixel-box p-4 sm:p-6 border-gray-600">
+            <p className="text-xs sm:text-sm text-nes-purple mb-3">&gt; エクスポート方法</p>
+            <ol className="text-xs text-gray-400 space-y-2 list-decimal list-inside">
+              <li><a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" className="text-nes-cyan hover:underline">chatgpt.com</a> にアクセス</li>
+              <li>右上のプロフィールアイコンをクリック</li>
+              <li>「設定」を選択</li>
+              <li>「データコントロール」を選択</li>
+              <li>「データをエクスポート」をクリック</li>
+              <li>届いたメールからZIPをダウンロード</li>
+              <li>ZIPを解凍して <span className="text-nes-green">conversations.json</span> をアップロード</li>
+            </ol>
           </div>
         </div>
       )
@@ -245,10 +258,10 @@ function App() {
         <div className="space-y-8">
           <div className="text-center">
             <h1 className="text-xl sm:text-2xl mb-2 pixel-gradient crt-glow">
-              YOUR 2024
+              YOUR HISTORY
             </h1>
             <p className="text-xs text-gray-400">
-              &gt; ChatGPTとの1年間_<span className="blink">|</span>
+              &gt; ChatGPTとの歩み_<span className="blink">|</span>
             </p>
           </div>
 

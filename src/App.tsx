@@ -123,11 +123,8 @@ function App() {
             <p className="text-xs sm:text-sm text-nes-purple mb-3">&gt; エクスポート方法</p>
             <ol className="text-xs text-gray-400 space-y-2 list-decimal list-inside">
               <li><a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" className="text-nes-cyan hover:underline">chatgpt.com</a> にアクセス</li>
-              <li>右上のプロフィールアイコンをクリック</li>
-              <li>「設定」を選択</li>
-              <li>「データコントロール」を選択</li>
-              <li>「データをエクスポート」をクリック</li>
-              <li>届いたメールからZIPをダウンロード</li>
+              <li>設定 → データコントロール → 「データをエクスポート」をクリック</li>
+              <li>届いたメールからZIPをダウンロード<span className="text-gray-500">（数時間かかる場合があります）</span></li>
               <li>ZIPを解凍して <span className="text-nes-green">conversations.json</span> をアップロード</li>
             </ol>
           </div>

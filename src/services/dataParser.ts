@@ -8,7 +8,7 @@ import type {
   ParseError,
 } from '../types'
 
-const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
+const MAX_FILE_SIZE = 1000 * 1024 * 1024 // 1GB
 
 export async function parseConversationsFile(file: File): Promise<ParseResult<Conversation[]>> {
   // File size validation
@@ -17,7 +17,7 @@ export async function parseConversationsFile(file: File): Promise<ParseResult<Co
       success: false,
       error: {
         code: 'FILE_TOO_LARGE',
-        message: `ファイルサイズが大きすぎます（${Math.round(file.size / 1024 / 1024)}MB）。100MB以下のファイルを選択してください。`,
+        message: `ファイルサイズが大きすぎます（${Math.round(file.size / 1024 / 1024)}MB）。1GB以下のファイルを選択してください。`,
       },
     }
   }

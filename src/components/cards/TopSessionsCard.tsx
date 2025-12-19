@@ -1,4 +1,5 @@
 import type { TopSession } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface TopSessionsCardProps {
   data: TopSession[]
@@ -7,9 +8,11 @@ interface TopSessionsCardProps {
 export function TopSessionsCard({ data }: TopSessionsCardProps) {
   return (
     <div className="pixel-box border-nes-orange bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-6 nes-orange crt-glow">
-        BEST CHATS
-      </h2>
+      <CardHeader
+        title="BEST CHATS"
+        description="AIが選んだ特に印象的だった会話のベスト5です"
+        colorClass="nes-orange"
+      />
 
       <div className="space-y-3">
         {data.slice(0, 5).map((session, i) => {

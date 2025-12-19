@@ -1,4 +1,5 @@
 import type { BestQuote } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface BestQuotesCardProps {
   data: BestQuote[]
@@ -7,9 +8,11 @@ interface BestQuotesCardProps {
 export function BestQuotesCard({ data }: BestQuotesCardProps) {
   return (
     <div className="pixel-box border-nes-cyan bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-6 nes-cyan crt-glow">
-        QUOTES
-      </h2>
+      <CardHeader
+        title="QUOTES"
+        description="AIが選んだあなたの印象的な発言ベスト5です"
+        colorClass="nes-cyan"
+      />
 
       <div className="space-y-4">
         {data.slice(0, 5).map((quote, i) => (

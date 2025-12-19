@@ -1,4 +1,5 @@
 import type { TopicClassification } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface TopicCardProps {
   data: TopicClassification
@@ -22,9 +23,11 @@ export function TopicCard({ data }: TopicCardProps) {
 
   return (
     <div className="pixel-box border-nes-purple bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-6 nes-purple crt-glow">
-        TOPICS TOP10
-      </h2>
+      <CardHeader
+        title="TOPICS TOP10"
+        description="ChatGPTとの会話でよく話題にしたトピックのランキングです"
+        colorClass="nes-purple"
+      />
 
       {/* Pixel Bar Chart */}
       <div className="space-y-2">

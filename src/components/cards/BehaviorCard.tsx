@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import type {
   BehaviorStats,
   InsightsStats,
@@ -10,6 +10,32 @@ import type {
   MVPConversation,
   WordFrequency,
 } from '../../types'
+import { CardHeader } from './CardHeader'
+
+interface TooltipStatProps {
+  children: ReactNode
+  description: string
+}
+
+function TooltipStat({ children, description }: TooltipStatProps) {
+  const [showTooltip, setShowTooltip] = useState(false)
+
+  return (
+    <div
+      className="relative cursor-help"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onClick={() => setShowTooltip(!showTooltip)}
+    >
+      {children}
+      {showTooltip && (
+        <div className="absolute z-50 left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 pixel-box border-gray-500 bg-gray-900 text-xs text-gray-300 whitespace-nowrap">
+          {description}
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface BehaviorCardProps {
   behavior: BehaviorStats
@@ -141,23 +167,31 @@ function HourlyHeatmapSection({ data }: { data: BehaviorStats['hourlyHeatmap'] }
 
   return (
     <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-      <h3 className="text-xs sm:text-sm mb-4 nes-cyan crt-glow">
-        RHYTHM
-      </h3>
+      <CardHeader
+        title="RHYTHM"
+        description="時間帯・曜日別のChatGPT利用パターンを分析"
+        colorClass="nes-cyan"
+      />
 
       <div className="grid grid-cols-3 gap-2 mb-4">
-        <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-          <div className={`text-xs ${chronotype.color}`}>{chronotype.label}</div>
-          <div className="text-xs text-gray-500">TYPE</div>
-        </div>
-        <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-          <div className="text-xs nes-cyan">{data.peakHour}:00</div>
-          <div className="text-xs text-gray-500">PEAK</div>
-        </div>
-        <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-          <div className="text-xs nes-purple">{dayNames[maxDayIndex]}</div>
-          <div className="text-xs text-gray-500">BEST</div>
-        </div>
+        <TooltipStat description="朝型・夜型などの利用タイプ">
+          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+            <div className={`text-xs ${chronotype.color}`}>{chronotype.label}</div>
+            <div className="text-xs text-gray-500">TYPE</div>
+          </div>
+        </TooltipStat>
+        <TooltipStat description="最も利用が多い時間帯">
+          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+            <div className="text-xs nes-cyan">{data.peakHour}:00</div>
+            <div className="text-xs text-gray-500">PEAK</div>
+          </div>
+        </TooltipStat>
+        <TooltipStat description="最も利用が多い曜日">
+          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+            <div className="text-xs nes-purple">{dayNames[maxDayIndex]}</div>
+            <div className="text-xs text-gray-500">BEST</div>
+          </div>
+        </TooltipStat>
       </div>
 
       <HourlyBarChart hourlyTotals={hourlyTotals} peakHour={data.peakHour} />
@@ -210,7 +244,11 @@ function CatchPhrasesSection({ phrases }: { phrases: BehaviorStats['catchPhrases
   if (phrases.length === 0) {
     return (
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-orange crt-glow">PHRASES</h3>
+        <CardHeader
+          title="PHRASES"
+          description="よく使う口癖やフレーズ"
+          colorClass="nes-orange"
+        />
         <p className="text-xs text-gray-400">&gt; NO DATA</p>
       </div>
     )
@@ -221,7 +259,11 @@ function CatchPhrasesSection({ phrases }: { phrases: BehaviorStats['catchPhrases
   return (
     <>
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-orange crt-glow">PHRASES</h3>
+        <CardHeader
+          title="PHRASES"
+          description="よく使う口癖やフレーズ"
+          colorClass="nes-orange"
+        />
         <div className="space-y-2">
           {phrases.map((phrase, index) => {
             const totalBlocks = 10
@@ -270,7 +312,11 @@ function NgramPhrasesSection({ ngrams }: { ngrams: BehaviorStats['ngramPhrases']
   if (!hasUnigrams && !hasBigrams && !hasTrigrams) {
     return (
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-cyan crt-glow">N-GRAMS</h3>
+        <CardHeader
+          title="N-GRAMS"
+          description="単語の組み合わせパターン（1〜3語）"
+          colorClass="nes-cyan"
+        />
         <p className="text-xs text-gray-400">&gt; NO DATA</p>
       </div>
     )
@@ -279,7 +325,11 @@ function NgramPhrasesSection({ ngrams }: { ngrams: BehaviorStats['ngramPhrases']
   return (
     <>
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-cyan crt-glow">N-GRAMS</h3>
+        <CardHeader
+          title="N-GRAMS"
+          description="単語の組み合わせパターン（1〜3語）"
+          colorClass="nes-cyan"
+        />
 
         {hasUnigrams && (
           <div className="mb-3">
@@ -361,17 +411,25 @@ function GratitudeSection({ gratitude }: { gratitude: BehaviorStats['gratitude']
   return (
     <>
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-green crt-glow">THANKS</h3>
+        <CardHeader
+          title="THANKS"
+          description="ChatGPTへの感謝の頻度とバリエーション"
+          colorClass="nes-green"
+        />
 
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-            <div className={`text-sm ${level.color}`}>{level.label}</div>
-            <div className="text-xs text-gray-500">LEVEL</div>
-          </div>
-          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-            <div className="text-sm nes-green">{gratitude.totalThanks}</div>
-            <div className="text-xs text-gray-500">COUNT</div>
-          </div>
+          <TooltipStat description="感謝の頻度に基づくレベル">
+            <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+              <div className={`text-sm ${level.color}`}>{level.label}</div>
+              <div className="text-xs text-gray-500">LEVEL</div>
+            </div>
+          </TooltipStat>
+          <TooltipStat description="感謝を伝えた回数">
+            <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+              <div className="text-sm nes-green">{gratitude.totalThanks}</div>
+              <div className="text-xs text-gray-500">COUNT</div>
+            </div>
+          </TooltipStat>
         </div>
 
         <div className="pixel-box border-gray-600 bg-gray-800/50 p-2">
@@ -419,17 +477,25 @@ function ConfusionSection({ confusion }: { confusion: BehaviorStats['confusion']
   return (
     <>
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-red crt-glow">CONFUSION</h3>
+        <CardHeader
+          title="CONFUSION"
+          description="迷いや困惑を示す表現の傾向"
+          colorClass="nes-red"
+        />
 
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-            <div className={`text-sm ${level.color}`}>{level.label}</div>
-            <div className="text-xs text-gray-500">LEVEL</div>
-          </div>
-          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-            <div className="text-sm nes-red">{confusion.confusionRate.toFixed(1)}%</div>
-            <div className="text-xs text-gray-500">RATE</div>
-          </div>
+          <TooltipStat description="迷いの頻度に基づくレベル">
+            <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+              <div className={`text-sm ${level.color}`}>{level.label}</div>
+              <div className="text-xs text-gray-500">LEVEL</div>
+            </div>
+          </TooltipStat>
+          <TooltipStat description="迷いを示す表現の割合">
+            <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+              <div className="text-sm nes-red">{confusion.confusionRate.toFixed(1)}%</div>
+              <div className="text-xs text-gray-500">RATE</div>
+            </div>
+          </TooltipStat>
         </div>
 
         {confusion.patterns.length > 0 && (
@@ -518,7 +584,11 @@ function FrequentWordsSection({ words }: { words: InsightsStats['frequentWords']
   return (
     <>
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-purple crt-glow">WORDS</h3>
+        <CardHeader
+          title="WORDS"
+          description="頻出キーワードTOP20"
+          colorClass="nes-purple"
+        />
         <div className="flex flex-wrap gap-1">
           {words.slice(0, 20).map((item, index) => (
             <button
@@ -583,17 +653,25 @@ function QuestionStatsSection({ stats }: { stats: InsightsStats['questionStats']
 
   return (
     <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-      <h3 className="text-xs sm:text-sm mb-3 nes-pink crt-glow">QUESTIONS</h3>
+      <CardHeader
+        title="QUESTIONS"
+        description="質問の頻度とパターン分析"
+        colorClass="nes-pink"
+      />
 
       <div className="grid grid-cols-2 gap-2 mb-3">
-        <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-          <div className="text-sm nes-pink">{stats.totalQuestions}</div>
-          <div className="text-xs text-gray-500">TOTAL</div>
-        </div>
-        <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
-          <div className="text-sm nes-pink">{stats.questionRate.toFixed(1)}%</div>
-          <div className="text-xs text-gray-500">RATE</div>
-        </div>
+        <TooltipStat description="質問の総数">
+          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+            <div className="text-sm nes-pink">{stats.totalQuestions}</div>
+            <div className="text-xs text-gray-500">TOTAL</div>
+          </div>
+        </TooltipStat>
+        <TooltipStat description="メッセージ中の質問の割合">
+          <div className="pixel-box border-gray-600 bg-gray-800/50 p-2 text-center">
+            <div className="text-sm nes-pink">{stats.questionRate.toFixed(1)}%</div>
+            <div className="text-xs text-gray-500">RATE</div>
+          </div>
+        </TooltipStat>
       </div>
 
       <div className="space-y-1">
@@ -630,7 +708,11 @@ function MVPConversationsSection({ conversations }: { conversations: MVPConversa
   return (
     <>
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-purple crt-glow">MVP CHATS</h3>
+        <CardHeader
+          title="MVP CHATS"
+          description="最もメッセージ数の多かった会話TOP5"
+          colorClass="nes-purple"
+        />
 
         <div className="space-y-2">
           {conversations.map((conv, index) => (
@@ -716,7 +798,11 @@ function FirstConversationsSection({ conversations }: { conversations: MVPConver
   return (
     <>
       <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm mb-3 nes-orange crt-glow">FIRST CHATS</h3>
+        <CardHeader
+          title="FIRST CHATS"
+          description="ChatGPTとの最初の会話たち"
+          colorClass="nes-orange"
+        />
 
         <div className="space-y-2">
           {conversations.slice(0, 5).map((conv, index) => (

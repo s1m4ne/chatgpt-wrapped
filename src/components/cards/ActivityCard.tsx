@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import type { ActivityPattern, YearlyHeatmap } from '../../types'
 import { useAnalysis } from '../../contexts'
+import { CardHeader } from './CardHeader'
 
 interface ActivityCardProps {
   activity: ActivityPattern
@@ -172,9 +173,11 @@ function YearlyHeatmapSection({ data }: { data: YearlyHeatmap }) {
 
   return (
     <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-      <h3 className="text-xs sm:text-sm mb-3 sm:mb-4 nes-cyan crt-glow">
-        &gt; {year} ACTIVITY
-      </h3>
+      <CardHeader
+        title={`${year} ACTIVITY`}
+        description="年間のアクティビティヒートマップ。クリックで会話詳細を表示"
+        colorClass="nes-cyan"
+      />
       <div className="overflow-x-auto -mx-2 px-2 overflow-y-visible">
         <div className="min-w-[700px] heatmap-container relative py-12">
           {/* Tooltip - position below for top rows, above for bottom rows */}
@@ -403,7 +406,11 @@ function MonthlyChartSection({ data }: { data: { month: string; count: number }[
 
   return (
     <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-      <h3 className="text-xs sm:text-sm mb-3 sm:mb-4 nes-purple crt-glow">&gt; MONTHLY</h3>
+      <CardHeader
+        title="MONTHLY"
+        description="月別のメッセージ数の推移グラフ"
+        colorClass="nes-purple"
+      />
       <div className="h-36 sm:h-48">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
@@ -429,7 +436,11 @@ function MonthlyChartSection({ data }: { data: { month: string; count: number }[
 function WeekdayChartSection({ data }: { data: { day: string; count: number }[] }) {
   return (
     <div className="pixel-box border-white bg-gray-900/80 p-4 sm:p-6">
-      <h3 className="text-xs sm:text-sm mb-3 sm:mb-4 nes-pink crt-glow">&gt; WEEKDAY</h3>
+      <CardHeader
+        title="WEEKDAY"
+        description="曜日別のメッセージ数分布"
+        colorClass="nes-pink"
+      />
       <div className="h-36 sm:h-48">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical">

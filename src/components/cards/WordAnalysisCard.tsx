@@ -1,4 +1,5 @@
 import type { WordAnalysis } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface WordAnalysisCardProps {
   data: WordAnalysis
@@ -7,9 +8,11 @@ interface WordAnalysisCardProps {
 export function WordAnalysisCard({ data }: WordAnalysisCardProps) {
   return (
     <div className="pixel-box border-nes-cyan bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-6 nes-cyan crt-glow">
-        WORDS
-      </h2>
+      <CardHeader
+        title="WORDS"
+        description="あなたがよく使う単語やフレーズの傾向を分析しています"
+        colorClass="nes-cyan"
+      />
 
       <div className="space-y-6">
         {/* Top Words */}

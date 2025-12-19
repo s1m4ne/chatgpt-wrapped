@@ -1,4 +1,5 @@
 import type { StyleDiagnosis } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface StyleDiagnosisCardProps {
   data: StyleDiagnosis
@@ -11,9 +12,11 @@ export function StyleDiagnosisCard({ data }: StyleDiagnosisCardProps) {
 
   return (
     <div className="pixel-box border-nes-pink bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-4 nes-pink crt-glow">
-        GPT STYLE
-      </h2>
+      <CardHeader
+        title="GPT STYLE"
+        description="あなたのChatGPTの使い方タイプと相性スコアを診断しています"
+        colorClass="nes-pink"
+      />
 
       <div className="text-center mb-6">
         <p className="text-gray-400 text-xs">&gt; あなたのタイプは...</p>

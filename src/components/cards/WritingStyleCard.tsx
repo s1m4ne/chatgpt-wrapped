@@ -1,4 +1,5 @@
 import type { WritingStyle } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface WritingStyleCardProps {
   data: WritingStyle
@@ -7,9 +8,11 @@ interface WritingStyleCardProps {
 export function WritingStyleCard({ data }: WritingStyleCardProps) {
   return (
     <div className="pixel-box border-nes-purple bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-6 nes-purple crt-glow">
-        STYLE
-      </h2>
+      <CardHeader
+        title="STYLE"
+        description="あなたの文章の特徴、感情傾向、質問パターンを分析しています"
+        colorClass="nes-purple"
+      />
 
       <div className="space-y-4">
         {/* Characteristics */}

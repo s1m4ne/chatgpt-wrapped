@@ -1,4 +1,5 @@
 import type { ThemeEvolution } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface ThemeEvolutionCardProps {
   data: ThemeEvolution
@@ -7,9 +8,11 @@ interface ThemeEvolutionCardProps {
 export function ThemeEvolutionCard({ data }: ThemeEvolutionCardProps) {
   return (
     <div className="pixel-box border-nes-green bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-6 nes-green crt-glow">
-        EVOLUTION
-      </h2>
+      <CardHeader
+        title="EVOLUTION"
+        description="月ごとの話題の変化を時系列で表示しています"
+        colorClass="nes-green"
+      />
 
       <div className="space-y-3">
         {data.months.map((month, i) => (

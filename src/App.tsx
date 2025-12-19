@@ -92,6 +92,34 @@ function App() {
   }, [apiKeyState, state.conversations, dispatch])
 
   const renderContent = () => {
+    // Parsing state - show loading
+    if (state.status === 'parsing') {
+      return (
+        <div className="space-y-8">
+          <div className="text-center">
+            <h1 className="text-2xl sm:text-3xl mb-4 pixel-gradient crt-glow">
+              LOADING...
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-400">
+              &gt; ファイルを読み込み中<span className="blink">_</span>
+            </p>
+          </div>
+
+          <div className="max-w-xl mx-auto text-center">
+            <div className="pixel-box p-8 border-nes-cyan">
+              <div className="text-4xl mb-4 animate-pulse">📂</div>
+              <p className="text-xs text-gray-400">
+                会話データを解析しています...
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                ファイルサイズによっては時間がかかる場合があります
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     // Step 1: File upload
     if (state.conversations.length === 0) {
       return (

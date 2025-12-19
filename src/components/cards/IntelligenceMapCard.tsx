@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { IntelligenceMap } from '../../types'
+import { CardHeader } from './CardHeader'
 
 interface IntelligenceMapCardProps {
   data: IntelligenceMap
@@ -22,9 +23,11 @@ export function IntelligenceMapCard({ data }: IntelligenceMapCardProps) {
 
   return (
     <div className="pixel-box border-nes-cyan bg-gray-900/80 p-4 sm:p-6">
-      <h2 className="text-sm sm:text-base text-center mb-6 nes-cyan crt-glow">
-        INT MAP
-      </h2>
+      <CardHeader
+        title="INT MAP"
+        description="会話を2次元マップにプロット。ポイントをクリックで詳細表示"
+        colorClass="nes-cyan"
+      />
 
       <div className="flex flex-col items-center">
         <svg width={size} height={size} className="pixel-box border-gray-600 bg-gray-900/50">

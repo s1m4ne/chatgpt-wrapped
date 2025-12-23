@@ -1,5 +1,6 @@
 export * from './conversation'
 export * from './statistics'
 export * from './analysis'
+export * from './personality'
 export * from './errors'
 export * from './llm'

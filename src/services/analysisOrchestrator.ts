@@ -1,15 +1,16 @@
 import { createLLMClient } from './clientFactory'
-import { IntelligenceMapService } from './intelligenceMapService'
 import type {
   Conversation,
   AnalysisResults,
-  WordAnalysis,
-  TopicClassification,
-  ThemeEvolution,
-  TopSession,
-  WritingStyle,
-  StyleDiagnosis,
-  BestQuote,
+  BigFiveAnalysis,
+  BigFiveScore,
+  MBTIAnalysis,
+  MBTIAxisScore,
+  ThinkingStyleAnalysis,
+  ThinkingStyleScores,
+  CommunicationAnalysis,
+  CommunicationPattern,
+  PersonalitySummary,
   LLMClient,
   LLMProvider,
   JSONSchema,
@@ -18,27 +19,22 @@ import type {
 type ProgressCallback = (progress: number, step: string) => void
 
 const TOTAL_TIMEOUT_MS = 300000 // 5 minutes total timeout
-const STEP_TIMEOUT_MS = 90000 // 90 seconds per step (gpt-5-nano is slow)
+const STEP_TIMEOUT_MS = 90000 // 90 seconds per step
 
-const ANALYSIS_STEPS = [
-  { key: 'wordAnalysis', label: '単語・フレーズ分析', weight: 12 },
-  { key: 'topicClassification', label: 'トピック分類', weight: 12 },
-  { key: 'themeEvolution', label: 'テーマ変遷分析', weight: 12 },
-  { key: 'topSessions', label: '代表セッション選出', weight: 12 },
-  { key: 'writingStyle', label: '文章特徴分析', weight: 12 },
-  { key: 'styleDiagnosis', label: 'GPTスタイル診断', weight: 12 },
-  { key: 'bestQuotes', label: '名言選出', weight: 8 },
-  { key: 'intelligenceMap', label: '知性マップ生成', weight: 20 },
+const PERSONALITY_ANALYSIS_STEPS = [
+  { key: 'bigFive', label: 'Big Five診断', weight: 20 },
+  { key: 'mbti', label: 'タイプ診断', weight: 20 },
+  { key: 'thinkingStyle', label: '思考スタイル分析', weight: 20 },
+  { key: 'communication', label: 'コミュニケーション分析', weight: 20 },
+  { key: 'personalitySummary', label: '総合サマリー生成', weight: 20 },
 ] as const
 
 export class AnalysisOrchestrator {
   private client: LLMClient
-  private mapService: IntelligenceMapService
   private aborted = false
 
   constructor(provider: LLMProvider, apiKey: string) {
     this.client = createLLMClient(provider, apiKey)
-    this.mapService = new IntelligenceMapService(provider, apiKey)
   }
 
   async runAllAnalyses(
@@ -50,13 +46,12 @@ export class AnalysisOrchestrator {
     let cumulativeProgress = 0
     const startTime = Date.now()
 
-    console.log('[Analysis] 分析開始', { conversationCount: conversations.length })
+    console.log('[Analysis] 性格分析開始', { conversationCount: conversations.length })
 
     const summaries = this.prepareConversationSummaries(conversations)
     console.log('[Analysis] サマリー準備完了', { summaryLength: summaries.length })
 
-    for (const step of ANALYSIS_STEPS) {
-      // Check total timeout
+    for (const step of PERSONALITY_ANALYSIS_STEPS) {
       const elapsed = Date.now() - startTime
       if (elapsed > TOTAL_TIMEOUT_MS) {
         console.warn('[Analysis] 全体タイムアウト - 部分結果を返却', { elapsed, completedSteps: Object.keys(results) })
@@ -75,7 +70,7 @@ export class AnalysisOrchestrator {
 
       try {
         const result = await this.withStepTimeout(
-          this.runAnalysis(step.key, summaries, conversations),
+          this.runAnalysis(step.key, summaries, results),
           step.key
         )
         if (result) {
@@ -86,7 +81,6 @@ export class AnalysisOrchestrator {
         }
       } catch (error) {
         console.error(`[Analysis] ${step.key} エラー:`, error, { duration: Date.now() - stepStart })
-        // Continue with next step instead of stopping
       }
 
       cumulativeProgress += step.weight
@@ -121,7 +115,7 @@ export class AnalysisOrchestrator {
 
   private prepareConversationSummaries(conversations: Conversation[]): string {
     return conversations
-      .slice(0, 100) // Limit to prevent token overflow
+      .slice(0, 100)
       .map((conv, i) => {
         const userMessages = conv.messages
           .filter((m) => m.role === 'user')
@@ -135,263 +129,312 @@ export class AnalysisOrchestrator {
   private async runAnalysis(
     key: string,
     summaries: string,
-    conversations: Conversation[]
+    previousResults: AnalysisResults
   ): Promise<unknown> {
     switch (key) {
-      case 'wordAnalysis':
-        return this.analyzeWords(summaries)
-      case 'topicClassification':
-        return this.classifyTopics(summaries)
-      case 'themeEvolution':
-        return this.analyzeThemeEvolution(summaries)
-      case 'topSessions':
-        return this.selectTopSessions(conversations)
-      case 'writingStyle':
-        return this.analyzeWritingStyle(summaries)
-      case 'styleDiagnosis':
-        return this.diagnoseStyle(summaries)
-      case 'bestQuotes':
-        return this.selectBestQuotes(summaries)
-      case 'intelligenceMap':
-        return this.mapService.generateMap(conversations)
+      case 'bigFive':
+        return this.analyzeBigFive(summaries)
+      case 'mbti':
+        return this.analyzeMBTI(summaries)
+      case 'thinkingStyle':
+        return this.analyzeThinkingStyle(summaries)
+      case 'communication':
+        return this.analyzeCommunication(summaries)
+      case 'personalitySummary':
+        return this.generatePersonalitySummary(summaries, previousResults)
       default:
         return null
     }
   }
 
-  private async analyzeWords(summaries: string): Promise<WordAnalysis | null> {
-    const prompt = `以下のChatGPT会話履歴から、ユーザーがよく使う単語とフレーズを分析してください。
+  private async analyzeBigFive(summaries: string): Promise<BigFiveAnalysis | null> {
+    const prompt = `以下のChatGPT会話履歴から、ユーザーの性格をBig Five（OCEAN）モデルで分析してください。
 
+会話履歴:
 ${summaries}
 
-分析結果をJSON形式で出力してください。`
-
-    const schema: JSONSchema = {
-      type: 'object',
-      properties: {
-        topWords: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              word: { type: 'string' },
-              count: { type: 'number' },
-            },
-            required: ['word', 'count'],
-          },
-        },
-        phrases: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-        importantWords: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              word: { type: 'string' },
-              tfidf: { type: 'number' },
-            },
-            required: ['word', 'tfidf'],
-          },
-        },
-      },
-      required: ['topWords', 'phrases', 'importantWords'],
-    }
-
-    const result = await this.client.generateWithSchema<WordAnalysis>(prompt, schema)
-    return result.success && result.data ? result.data : null
-  }
-
-  private async classifyTopics(summaries: string): Promise<TopicClassification | null> {
-    const prompt = `以下のChatGPT会話履歴を分析し、トピック別に分類してください。各トピックには適切な絵文字を付けてください。
-
-${summaries}
-
-上位10個のトピックをJSON形式で出力してください。`
-
-    const schema: JSONSchema = {
-      type: 'object',
-      properties: {
-        topics: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              percentage: { type: 'number' },
-              emoji: { type: 'string' },
-            },
-            required: ['name', 'percentage', 'emoji'],
-          },
-        },
-      },
-      required: ['topics'],
-    }
-
-    const result = await this.client.generateWithSchema<TopicClassification>(prompt, schema)
-    return result.success && result.data ? result.data : null
-  }
-
-  private async analyzeThemeEvolution(summaries: string): Promise<ThemeEvolution | null> {
-    const prompt = `以下のChatGPT会話履歴を月ごとに分析し、テーマの変遷を抽出してください。新しく登場したトピックも特定してください。
-
-${summaries}
+各因子を0-100のスコアで評価し、それぞれの説明を付けてください。
+- Openness（開放性）: 新しいアイデアや経験への興味、創造性
+- Conscientiousness（誠実性）: 計画性、責任感、目標志向
+- Extraversion（外向性）: 社交性、積極性、会話の活発さ
+- Agreeableness（協調性）: 協力的態度、感謝表現、柔軟性
+- Neuroticism（神経症傾向）: 不安傾向、確認行動、迷いの表現
 
 JSON形式で出力してください。`
 
     const schema: JSONSchema = {
       type: 'object',
       properties: {
-        months: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              month: { type: 'string' },
-              mainTopics: {
-                type: 'array',
-                items: { type: 'string' },
-              },
-              newTopics: {
-                type: 'array',
-                items: { type: 'string' },
-              },
-            },
-            required: ['month', 'mainTopics', 'newTopics'],
+        scores: {
+          type: 'object',
+          properties: {
+            openness: { type: 'number' },
+            conscientiousness: { type: 'number' },
+            extraversion: { type: 'number' },
+            agreeableness: { type: 'number' },
+            neuroticism: { type: 'number' },
           },
+          required: ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'],
         },
+        descriptions: {
+          type: 'object',
+          properties: {
+            openness: { type: 'string' },
+            conscientiousness: { type: 'string' },
+            extraversion: { type: 'string' },
+            agreeableness: { type: 'string' },
+            neuroticism: { type: 'string' },
+          },
+          required: ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'],
+        },
+        dominantTrait: { type: 'string' },
+        summary: { type: 'string' },
       },
-      required: ['months'],
+      required: ['scores', 'descriptions', 'dominantTrait', 'summary'],
     }
 
-    const result = await this.client.generateWithSchema<ThemeEvolution>(prompt, schema)
-    return result.success && result.data ? result.data : null
-  }
+    const result = await this.client.generateWithSchema<{
+      scores: BigFiveScore
+      descriptions: BigFiveAnalysis['descriptions']
+      dominantTrait: string
+      summary: string
+    }>(prompt, schema)
 
-  private async selectTopSessions(conversations: Conversation[]): Promise<TopSession[] | null> {
-    const summaries = conversations.slice(0, 50).map((conv) => ({
-      id: conv.id,
-      title: conv.title,
-      messageCount: conv.messages.length,
-      preview: conv.messages
-        .filter((m) => m.role === 'user')
-        .map((m) => m.content.slice(0, 100))
-        .join(' ')
-        .slice(0, 300),
-    }))
-
-    const prompt = `以下のChatGPT会話から、最も印象的な会話を5つ選出してください。
-選出基準: 会話の深度、技術的密度、感情的な変動、創造性など
-
-会話リスト:
-${JSON.stringify(summaries, null, 2)}
-
-各会話に印象的なタイトルと選出理由を付けてJSON形式で出力してください。`
-
-    const schema: JSONSchema = {
-      type: 'object',
-      properties: {
-        sessions: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              conversationId: { type: 'string' },
-              title: { type: 'string' },
-              reason: { type: 'string' },
-              score: { type: 'number' },
-            },
-            required: ['conversationId', 'title', 'reason', 'score'],
-          },
-        },
-      },
-      required: ['sessions'],
+    if (result.success && result.data) {
+      return {
+        ...result.data,
+        dominantTrait: result.data.dominantTrait as keyof BigFiveScore,
+      }
     }
-
-    const result = await this.client.generateWithSchema<{ sessions: TopSession[] }>(prompt, schema)
-    return result.success && result.data ? result.data.sessions : null
+    return null
   }
 
-  private async analyzeWritingStyle(summaries: string): Promise<WritingStyle | null> {
-    const prompt = `以下のChatGPT会話履歴からユーザーの文章スタイルと感情傾向を分析してください。
+  private async analyzeMBTI(summaries: string): Promise<MBTIAnalysis | null> {
+    const prompt = `以下のChatGPT会話履歴から、ユーザーのMBTI風性格タイプを診断してください。
 
+会話履歴:
 ${summaries}
 
-分析結果をJSON形式で出力してください。`
+4つの軸それぞれを-100から+100のスコアで評価してください:
+- E/I軸: 外向(+100) vs 内向(-100) - 会話スタイル、雑談傾向
+- S/N軸: 直感(+100) vs 感覚(-100) - 抽象的思考 vs 具体的思考
+- T/F軸: 感情(+100) vs 思考(-100) - 感情的アプローチ vs 論理的アプローチ
+- J/P軸: 知覚(+100) vs 判断(-100) - 探索的 vs 計画的
 
-    const schema: JSONSchema = {
-      type: 'object',
-      properties: {
-        characteristics: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-        emotionalTendency: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-        questionPatterns: {
-          type: 'array',
-          items: { type: 'string' },
-        },
-      },
-      required: ['characteristics', 'emotionalTendency', 'questionPatterns'],
-    }
+4文字のタイプコード（例: INTJ）、日本語のタイプ名（例: 建築家）、ChatGPT活用スタイルの説明を出力してください。
 
-    const result = await this.client.generateWithSchema<WritingStyle>(prompt, schema)
-    return result.success && result.data ? result.data : null
-  }
-
-  private async diagnoseStyle(summaries: string): Promise<StyleDiagnosis | null> {
-    const prompt = `以下のChatGPT利用パターンから、ユーザーの「GPT活用タイプ」を診断してください。
-タイプ例: 思索型、企画爆発型、効率追求型、学習探求型、クリエイティブ型など
-
-${summaries}
-
-ユニークで面白いタイプ名と説明、相性スコア（0-100%）をJSON形式で出力してください。`
+JSON形式で出力してください。`
 
     const schema: JSONSchema = {
       type: 'object',
       properties: {
         type: { type: 'string' },
-        compatibilityScore: { type: 'number' },
+        axisScores: {
+          type: 'object',
+          properties: {
+            ei: { type: 'number' },
+            sn: { type: 'number' },
+            tf: { type: 'number' },
+            jp: { type: 'number' },
+          },
+          required: ['ei', 'sn', 'tf', 'jp'],
+        },
+        typeTitle: { type: 'string' },
         description: { type: 'string' },
+        chatgptStyle: { type: 'string' },
       },
-      required: ['type', 'compatibilityScore', 'description'],
+      required: ['type', 'axisScores', 'typeTitle', 'description', 'chatgptStyle'],
     }
 
-    const result = await this.client.generateWithSchema<StyleDiagnosis>(prompt, schema)
+    const result = await this.client.generateWithSchema<{
+      type: string
+      axisScores: MBTIAxisScore
+      typeTitle: string
+      description: string
+      chatgptStyle: string
+    }>(prompt, schema)
+
     return result.success && result.data ? result.data : null
   }
 
-  private async selectBestQuotes(summaries: string): Promise<BestQuote[] | null> {
-    const prompt = `以下のChatGPT会話履歴から、最も印象的なユーザーの発言（名言/ベストプロンプト）を5つ選出してください。
+  private async analyzeThinkingStyle(summaries: string): Promise<ThinkingStyleAnalysis | null> {
+    const prompt = `以下のChatGPT会話履歴から、ユーザーの思考スタイルを分析してください。
 
+会話履歴:
 ${summaries}
 
-各名言に選出理由と文脈を付けてJSON形式で出力してください。`
+4つの軸それぞれを-100から+100のスコアで評価してください:
+- 論理的(-100) vs 創造的(+100): 論理的思考か創造的思考か
+- 専門型(-100) vs 汎用型(+100): 特定分野の深堀りか幅広い探求か
+- 実践的(-100) vs 理論的(+100): 実用的解決か理論的理解か
+- 独立型(-100) vs 協調型(+100): 自己完結か対話重視か
+
+ユニークな思考スタイル名（例: 「探求するエンジニア」）、説明、強み、特徴を出力してください。
+
+JSON形式で出力してください。`
 
     const schema: JSONSchema = {
       type: 'object',
       properties: {
-        quotes: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              quote: { type: 'string' },
-              context: { type: 'string' },
-              reason: { type: 'string' },
-            },
-            required: ['quote', 'context', 'reason'],
+        scores: {
+          type: 'object',
+          properties: {
+            logicalCreative: { type: 'number' },
+            specialistGeneralist: { type: 'number' },
+            practicalTheoretical: { type: 'number' },
+            independentCollaborative: { type: 'number' },
           },
+          required: ['logicalCreative', 'specialistGeneralist', 'practicalTheoretical', 'independentCollaborative'],
+        },
+        styleName: { type: 'string' },
+        description: { type: 'string' },
+        strengths: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        characteristics: {
+          type: 'array',
+          items: { type: 'string' },
         },
       },
-      required: ['quotes'],
+      required: ['scores', 'styleName', 'description', 'strengths', 'characteristics'],
     }
 
-    const result = await this.client.generateWithSchema<{ quotes: BestQuote[] }>(prompt, schema)
-    return result.success && result.data ? result.data.quotes : null
+    const result = await this.client.generateWithSchema<{
+      scores: ThinkingStyleScores
+      styleName: string
+      description: string
+      strengths: string[]
+      characteristics: string[]
+    }>(prompt, schema)
+
+    return result.success && result.data ? result.data : null
+  }
+
+  private async analyzeCommunication(summaries: string): Promise<CommunicationAnalysis | null> {
+    const prompt = `以下のChatGPT会話履歴から、ユーザーのコミュニケーション傾向を分析してください。
+
+会話履歴:
+${summaries}
+
+以下のパターンを特定してください:
+- questionStyle: "direct"（直接的）/ "gradual"（段階的）/ "exploratory"（探索的）
+- expectedResponseFormat: "concise"（簡潔）/ "detailed"（詳細）/ "interactive"（対話的）
+- feedbackTendency: "immediate"（即座）/ "delayed"（遅延）/ "minimal"（最小限）
+- informationProcessing: "structured"（構造的）/ "freeform"（自由形式）
+
+各パターンの説明、強み、改善点、AIとの効果的な対話のベストプラクティスを出力してください。
+
+JSON形式で出力してください。`
+
+    const schema: JSONSchema = {
+      type: 'object',
+      properties: {
+        patterns: {
+          type: 'object',
+          properties: {
+            questionStyle: { type: 'string' },
+            expectedResponseFormat: { type: 'string' },
+            feedbackTendency: { type: 'string' },
+            informationProcessing: { type: 'string' },
+          },
+          required: ['questionStyle', 'expectedResponseFormat', 'feedbackTendency', 'informationProcessing'],
+        },
+        descriptions: {
+          type: 'object',
+          properties: {
+            questionStyle: { type: 'string' },
+            expectedResponseFormat: { type: 'string' },
+            feedbackTendency: { type: 'string' },
+            informationProcessing: { type: 'string' },
+          },
+          required: ['questionStyle', 'expectedResponseFormat', 'feedbackTendency', 'informationProcessing'],
+        },
+        strengths: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        improvements: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        bestPractices: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+      },
+      required: ['patterns', 'descriptions', 'strengths', 'improvements', 'bestPractices'],
+    }
+
+    const result = await this.client.generateWithSchema<{
+      patterns: CommunicationPattern
+      descriptions: CommunicationAnalysis['descriptions']
+      strengths: string[]
+      improvements: string[]
+      bestPractices: string[]
+    }>(prompt, schema)
+
+    return result.success && result.data ? result.data : null
+  }
+
+  private async generatePersonalitySummary(
+    summaries: string,
+    previousResults: AnalysisResults
+  ): Promise<PersonalitySummary | null> {
+    const contextInfo = []
+    if (previousResults.bigFive) {
+      contextInfo.push(`Big Five: ${previousResults.bigFive.dominantTrait}が優勢、${previousResults.bigFive.summary}`)
+    }
+    if (previousResults.mbti) {
+      contextInfo.push(`MBTI: ${previousResults.mbti.type}（${previousResults.mbti.typeTitle}）`)
+    }
+    if (previousResults.thinkingStyle) {
+      contextInfo.push(`思考スタイル: ${previousResults.thinkingStyle.styleName}`)
+    }
+
+    const prompt = `以下のChatGPT会話履歴と分析結果から、ユーザーの総合的なパーソナリティサマリーを生成してください。
+
+会話履歴:
+${summaries}
+
+これまでの分析結果:
+${contextInfo.join('\n')}
+
+以下を出力してください:
+- title: ユニークで印象的なパーソナリティタイトル（例: 「探求する革新者」「論理の詩人」）
+- emoji: タイトルに合った絵文字1つ
+- tagline: 一言キャッチコピー（20文字以内）
+- description: 3-5文での性格特徴の説明
+- strengths: AI活用における3つの強み
+- growthPoints: さらに活用を高める2つのポイント
+- recommendations: 性格に基づく3つの具体的なAI活用提案
+
+JSON形式で出力してください。`
+
+    const schema: JSONSchema = {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        emoji: { type: 'string' },
+        tagline: { type: 'string' },
+        description: { type: 'string' },
+        strengths: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        growthPoints: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        recommendations: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+      },
+      required: ['title', 'emoji', 'tagline', 'description', 'strengths', 'growthPoints', 'recommendations'],
+    }
+
+    const result = await this.client.generateWithSchema<PersonalitySummary>(prompt, schema)
+    return result.success && result.data ? result.data : null
   }
 }

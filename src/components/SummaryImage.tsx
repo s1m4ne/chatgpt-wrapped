@@ -1,14 +1,20 @@
 import { useRef } from 'react'
 import html2canvas from 'html2canvas'
-import type { BasicStats, StyleDiagnosis, TopicClassification } from '../types'
+import type { BasicStats } from '../types'
+
+interface SummaryDiagnosis {
+  type: string
+  compatibilityScore: number
+  description: string
+}
 
 interface SummaryImageProps {
   stats: BasicStats
-  diagnosis?: StyleDiagnosis
-  topics?: TopicClassification
+  diagnosis?: SummaryDiagnosis
+  topics?: undefined
 }
 
-export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
+export function SummaryImage({ stats, diagnosis }: SummaryImageProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleDownload = async () => {
@@ -20,12 +26,10 @@ export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
     })
 
     const link = document.createElement('a')
-    link.download = 'chatgpt-wrapped-2024.png'
+    link.download = 'chatgpt-wrapped-personality.png'
     link.href = canvas.toDataURL('image/png')
     link.click()
   }
-
-  const topTopics = topics?.topics.slice(0, 3) || []
 
   return (
     <div className="space-y-4">
@@ -38,8 +42,9 @@ export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
         {/* Header */}
         <div className="text-center mb-4">
           <h1 className="text-base nes-pink crt-glow">
-            ChatGPT 2024
+            ChatGPT Wrapped
           </h1>
+          <p className="text-xs text-gray-500 mt-1">PERSONALITY ANALYSIS</p>
         </div>
 
         {/* Stats grid */}
@@ -50,34 +55,20 @@ export function SummaryImage({ stats, diagnosis, topics }: SummaryImageProps) {
           <StatBox value={`${stats.longestStreak}`} label="STREAK" />
         </div>
 
-        {/* Diagnosis type */}
+        {/* Personality type */}
         {diagnosis && (
-          <div className="pixel-box border-gray-600 bg-gray-800/50 p-3 mb-3 text-center">
-            <div className="text-xs text-gray-400 mb-1">&gt; TYPE</div>
-            <div className="text-xs nes-purple">{diagnosis.type}</div>
-            <div className="text-xs nes-pink mt-1">{diagnosis.compatibilityScore}%</div>
-          </div>
-        )}
-
-        {/* Top topics */}
-        {topTopics.length > 0 && (
-          <div className="pixel-box border-gray-600 bg-gray-800/50 p-3 flex-1">
-            <div className="text-xs text-gray-400 mb-2">&gt; TOPICS</div>
-            <div className="space-y-1">
-              {topTopics.map((topic, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs">
-                  <span>{topic.emoji}</span>
-                  <span className="text-gray-300 flex-1 truncate">{topic.name}</span>
-                  <span className="text-gray-500">{topic.percentage.toFixed(0)}%</span>
-                </div>
-              ))}
+          <div className="pixel-box border-yellow-400 bg-yellow-400/10 p-3 mb-3 text-center flex-1">
+            <div className="text-xs text-gray-400 mb-2">&gt; YOUR TYPE</div>
+            <div className="text-sm text-yellow-400 mb-2">{diagnosis.type}</div>
+            <div className="text-xs text-gray-300 leading-relaxed line-clamp-4">
+              {diagnosis.description}
             </div>
           </div>
         )}
 
         {/* Footer */}
         <div className="mt-auto pt-3 text-center">
-          <div className="text-xs text-gray-600">WRAPPED 2024</div>
+          <div className="text-xs text-gray-600">chatgpt-wrapped.vercel.app</div>
         </div>
       </div>
 

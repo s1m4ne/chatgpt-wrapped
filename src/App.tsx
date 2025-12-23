@@ -6,17 +6,15 @@ import {
   ProgressBar,
   CardSwiper,
   SummaryImage,
+  StatsSummary,
   StatsCard,
   ActivityCard,
   BehaviorCard,
-  WordAnalysisCard,
-  TopicCard,
-  ThemeEvolutionCard,
-  TopSessionsCard,
-  WritingStyleCard,
-  StyleDiagnosisCard,
-  BestQuotesCard,
-  IntelligenceMapCard,
+  PersonalitySummaryCard,
+  BigFiveCard,
+  MBTICard,
+  ThinkingStyleCard,
+  CommunicationCard,
 } from './components'
 import {
   parseConversationsFile,
@@ -91,6 +89,26 @@ function App() {
     }
   }, [apiKeyState, state.conversations, dispatch])
 
+  // 統計サマリーをレンダリング（LLM不要の分析結果）
+  const renderStatsSummary = () => {
+    if (
+      state.results.basicStats &&
+      state.results.activityPattern &&
+      state.results.behaviorStats &&
+      state.results.insightsStats
+    ) {
+      return (
+        <StatsSummary
+          stats={state.results.basicStats}
+          activity={state.results.activityPattern}
+          behavior={state.results.behaviorStats}
+          insights={state.results.insightsStats}
+        />
+      )
+    }
+    return null
+  }
+
   const renderContent = () => {
     // Parsing state - show loading
     if (state.status === 'parsing') {
@@ -161,7 +179,7 @@ function App() {
     }
 
     // Step 2: API Key setup and analysis trigger
-    if (state.status === 'idle' && !state.results.wordAnalysis) {
+    if (state.status === 'idle' && !state.results.bigFive) {
       return (
         <div className="space-y-8">
           <div className="text-center">
@@ -192,7 +210,7 @@ function App() {
                     : 'bg-nes-green border-green-300'
                 }`}
               >
-                &gt; {apiKeyState.provider === 'gemini' ? 'GEMINI' : 'OPENAI'}で分析開始
+                &gt; {apiKeyState.provider === 'gemini' ? 'GEMINI' : 'OPENAI'}で性格分析開始
               </button>
             )}
           </div>
@@ -200,7 +218,7 @@ function App() {
       )
     }
 
-    // Step 3: Analyzing
+    // Step 3: Analyzing - LLM待ち画面に統計情報を常時表示
     if (state.status === 'analyzing') {
       return (
         <div className="space-y-8">
@@ -209,7 +227,7 @@ function App() {
               ANALYZING...
             </h1>
             <p className="text-xs text-gray-400">
-              &gt; AIがあなたの会話を分析中<span className="blink">_</span>
+              &gt; AIがあなたの性格を分析中<span className="blink">_</span>
             </p>
           </div>
 
@@ -219,62 +237,46 @@ function App() {
             hasError={false}
             onRetry={handleStartAnalysis}
           />
+
+          {/* LLM分析中も統計情報を下部に表示 */}
+          {renderStatsSummary()}
         </div>
       )
     }
 
-    // Step 4: Results
-    if (state.status === 'complete' || state.results.wordAnalysis) {
+    // Step 4: Results - 性格分析カードのみをスワイパーに、統計は下部に固定表示
+    if (state.status === 'complete' || state.results.bigFive) {
       const cards = []
 
-      if (state.results.basicStats) {
-        cards.push(<StatsCard key="stats" stats={state.results.basicStats} />)
+      // 性格分析カードのみ
+      if (state.results.personalitySummary) {
+        cards.push(<PersonalitySummaryCard key="summary" data={state.results.personalitySummary} />)
       }
-      if (state.results.activityPattern) {
-        cards.push(<ActivityCard key="activity" activity={state.results.activityPattern} />)
+      if (state.results.bigFive) {
+        cards.push(<BigFiveCard key="bigfive" data={state.results.bigFive} />)
       }
-      if (state.results.behaviorStats && state.results.insightsStats) {
-        cards.push(
-          <BehaviorCard
-            key="behavior"
-            behavior={state.results.behaviorStats}
-            insights={state.results.insightsStats}
-          />
-        )
+      if (state.results.mbti) {
+        cards.push(<MBTICard key="mbti" data={state.results.mbti} />)
       }
-      if (state.results.styleDiagnosis) {
-        cards.push(<StyleDiagnosisCard key="diagnosis" data={state.results.styleDiagnosis} />)
+      if (state.results.thinkingStyle) {
+        cards.push(<ThinkingStyleCard key="thinking" data={state.results.thinkingStyle} />)
       }
-      if (state.results.topicClassification) {
-        cards.push(<TopicCard key="topics" data={state.results.topicClassification} />)
-      }
-      if (state.results.wordAnalysis) {
-        cards.push(<WordAnalysisCard key="words" data={state.results.wordAnalysis} />)
-      }
-      if (state.results.themeEvolution) {
-        cards.push(<ThemeEvolutionCard key="themes" data={state.results.themeEvolution} />)
-      }
-      if (state.results.topSessions) {
-        cards.push(<TopSessionsCard key="sessions" data={state.results.topSessions} />)
-      }
-      if (state.results.writingStyle) {
-        cards.push(<WritingStyleCard key="style" data={state.results.writingStyle} />)
-      }
-      if (state.results.bestQuotes) {
-        cards.push(<BestQuotesCard key="quotes" data={state.results.bestQuotes} />)
-      }
-      if (state.results.intelligenceMap) {
-        cards.push(<IntelligenceMapCard key="map" data={state.results.intelligenceMap} />)
+      if (state.results.communication) {
+        cards.push(<CommunicationCard key="communication" data={state.results.communication} />)
       }
 
-      // Add summary image card at the end
+      // サマリー画像カード
       if (state.results.basicStats) {
         cards.push(
           <SummaryImage
-            key="summary"
+            key="image"
             stats={state.results.basicStats}
-            diagnosis={state.results.styleDiagnosis}
-            topics={state.results.topicClassification}
+            diagnosis={state.results.personalitySummary ? {
+              type: state.results.personalitySummary.title,
+              compatibilityScore: 0,
+              description: state.results.personalitySummary.description,
+            } : undefined}
+            topics={undefined}
           />
         )
       }
@@ -283,14 +285,17 @@ function App() {
         <div className="space-y-8">
           <div className="text-center">
             <h1 className="text-xl sm:text-2xl mb-2 pixel-gradient crt-glow">
-              YOUR HISTORY
+              YOUR PERSONALITY
             </h1>
             <p className="text-xs text-gray-400">
-              &gt; ChatGPTとの歩み_<span className="blink">|</span>
+              &gt; ChatGPTが見たあなた_<span className="blink">|</span>
             </p>
           </div>
 
           <CardSwiper>{cards}</CardSwiper>
+
+          {/* 性格分析カードの下に統計情報を固定表示 */}
+          {renderStatsSummary()}
 
           <div className="text-center">
             <button
